@@ -1,0 +1,81 @@
+
+scenarios:
+  - name: should allow referencing value
+    options:
+      refs: true
+    when:
+      $var: 
+        echo: test
+      $result: 
+        echo: this {$var} is awesome!
+    output: 
+      $var: test
+      $result: this test is awesome!
+
+  - name: should allow referencing object
+    options:
+      refs: true
+    when:
+      $var:
+        echo: 
+          foo: test
+          bar: awesome
+      $result: 
+        echo: this {$var.foo} is {$var.bar}!
+    output:
+      $var:
+        foo: test
+        bar: awesome
+      $result: this test is awesome!
+  
+  - name: should allow referencing arrays
+    options:
+      refs: true
+    when:
+      $var:
+        echo:
+          - test
+          - awesome
+      $result:
+        echo: this {$var[0]} is {$var[1]}!
+    output:
+      $var:
+        - test
+        - awesome
+      $result: this test is awesome!        
+  
+  - name: should allow referencing nested vars
+    inconclusive: order of execution??
+    focus: true
+    options:
+      refs: true
+    when:
+      $var:
+        $nest:
+          echo:
+            - test
+            - awesome
+      $result:
+        echo: this {$var.$nest[0]} is {$var.nest[1]}!
+    output:
+      $var:
+        $nest:
+          - test
+          - awesome
+      $result: this test is awesome!      
+
+  - name: should allow referencing token
+    inconclusive: todo
+    options:
+      refs: true
+    when:
+      $var:
+        echo: test
+        ping: 
+      $result:
+        echo: {$var}
+    output:
+      $var: test
+      $result: 
+        echo: test
+        ping: pong

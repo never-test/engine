@@ -14,32 +14,16 @@
         <PackageReference Include="MSTest.TestAdapter" Version="2.2.10"/>
         <PackageReference Include="MSTest.TestFramework" Version="2.2.10"/>
         <PackageReference Include="coverlet.collector" Version="3.2.0"/>
-        <PackageReference Include="YamlConvert" Version="2.1.1" />
+        <PackageReference Include="YamlConvert" Version="2.1.1"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\MSTest\MSTest.csproj" />
+        <ProjectReference Include="..\..\MSTest\MSTest.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="acts\basics.yaml">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="acts\echo.yaml">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="acts\folding.yaml">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="acts\naming.yaml">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="acts\advanced.yaml">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="acts\nesting.yaml">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+        <None Update="**\*.yaml">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
-
 </Project>
