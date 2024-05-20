@@ -1,0 +1,21 @@
+scenarios:
+  - name: should fold by default
+    when:
+      echo: one
+    output: one
+  
+  - name: when folding is disabled should not fold
+    options:
+      folding: false
+    when:
+      echo: one
+    output:
+      echo: one
+    
+  - name: should allow defining object-form act with multiple steps
+    when:
+      echo: one
+      ping:
+    output:
+      echo: one
+      ping: pong

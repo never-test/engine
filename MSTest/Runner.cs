@@ -1,3 +1,4 @@
+using System.Runtime.ExceptionServices;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NeverTest.MSTest;
@@ -10,7 +11,7 @@ public abstract class Runner<T> where T : IState
 
     protected async Task Run(Scenario<T> scenario)
     {
-        var result = await scenario.Execute(CreateState);
+        var result = await scenario.Run(CreateState);
 
         if (!string.IsNullOrEmpty(scenario.Inconclusive))
         {
@@ -22,7 +23,11 @@ public abstract class Runner<T> where T : IState
             TestContext.WriteLine(log);
         }
         
-        result.ExceptionDispatchInfo?.Throw();
+        if (result.Exception is not null)
+        {
+             ExceptionDispatchInfo.Capture(result.Exception).Throw();
+        }
+ 
     }
 
     protected abstract Task<T> CreateState();

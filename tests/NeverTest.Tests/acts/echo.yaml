@@ -2,19 +2,16 @@ scenarios:
   - name: should echo value
     when:
       echo: one
-    output:
-      echo: one
+    output: one
 
   - name: should echo object
-    focus: y
     when:
       echo:
         foo: bar
         baz: zoo
     output:
-      echo:
-        foo: bar
-        baz: zoo
+      foo: bar
+      baz: zoo
 
   - name: should echo array
     when:
@@ -22,6 +19,5 @@ scenarios:
         - foo
         - bar
     output:
-      echo:
-        - foo
-        - bar    
+      - foo
+      - bar    

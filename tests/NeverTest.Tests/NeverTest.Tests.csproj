@@ -22,19 +22,22 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="basic-acts.yaml">
+      <None Update="acts\basics.yaml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="nested-acts.yaml">
+      <None Update="acts\echo.yaml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="named-outputs.yaml">
+      <None Update="acts\folding.yaml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="echo.yaml">
+      <None Update="acts\naming.yaml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="nested-named-outputs.yaml">
+      <None Update="acts\advanced.yaml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="acts\nesting.yaml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>

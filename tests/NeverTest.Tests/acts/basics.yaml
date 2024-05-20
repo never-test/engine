@@ -1,7 +1,7 @@
 scenarios:
 
   - name: should allow defining value-form act
-    description: |
+    describe: |
       value-form acts cannot have inputs,
       this input to act declared in thi form
       will be null 
@@ -11,9 +11,8 @@ scenarios:
   - name: should allow defining object-form act with single step
     when: 
       echo: one
-    output:
-      echo: one
-        
+    output: one
+       
   - name: should allow defining object-form act with multiple steps
     when:
       echo: one
@@ -35,14 +34,28 @@ scenarios:
       - echo: one
       - echo: two
     output:
+      - one
+      - two    
+
+  - name: should allow defining array-form act with object-form steps containing single act
+    describe: when folding is disabled - includes act names
+    options:
+      folding: no
+    when:
       - echo: one
-      - echo: two    
+      - echo: two
+    output:
+      - echo: one
+      - echo: two
 
   - name: should allow array-form acts with mixed form steps
+    describe: |
+      since folding is enabled by default act name (echo)
+      is omitted in the output 
     when:
       - ping
       - echo: two
     output:
       - pong
-      - echo: two    
+      - two    
           

@@ -1,0 +1,101 @@
+scenarios:
+  - name: should allow nest variables
+    when:
+      $outer:
+        $inner:
+          $deeper: ping
+    output:
+      $outer:
+        $inner:
+          $deeper: pong
+          
+  - name: should allow using variables in nested acts
+    when: 
+      $result: 
+        repeat:
+         times: 2
+         act: 
+           $res: ping
+    output:
+      $result:
+        - $res: pong
+        - $res: pong
+
+  - name: should allow being deep
+    describe: advanced deepness
+    options:
+      folding: no
+    when:
+      $result:
+        repeat:
+          times: 2
+          act:
+            $res: 
+              - ping
+              - $deep:
+                  repeat:
+                    times: 2
+                    act: ping
+            echo: foo
+    output:
+      $result:
+        repeat:
+        - $res:
+            - pong
+            - $deep:
+                repeat:
+                  - pong
+                  - pong
+          echo: foo
+        - $res:
+            - pong
+            - $deep:
+                repeat:
+                  - pong
+                  - pong
+          echo: foo
+
+  - name: should allow being deep (folding enabled)
+    describe: same as aboveWith folding enabled
+    when:
+      $result:
+        repeat:
+          times: 2
+          act:
+            $res:
+              - ping
+              - $deep:
+                  repeat:
+                    times: 2
+                    act: ping
+            echo: foo
+    output:
+      $result:
+        - $res:
+            - pong
+            - $deep:
+                - pong
+                - pong
+          echo: foo
+        - $res:
+            - pong
+            - $deep:
+                - pong
+                - pong
+          echo: foo
+  
+  - name: should allow using variables in nested acts with folding disabled
+    describe:
+    options:
+      folding: no
+    when:
+      $result:
+        repeat:
+          times: 2
+          act:
+            $res: ping
+    output:
+      $result:
+        repeat:
+          - $res: pong
+          - $res: pong

@@ -1,0 +1,40 @@
+scenarios:
+  - name: should allow naming value-form act 
+    when: 
+      $result: ping
+    output:
+      $result: pong
+  
+  - name: when folding is disabled - should allow naming object-form act in original form
+    options:
+      folding: no
+    when:
+      $result: 
+        echo: foo
+    output:
+      $result:
+        echo: foo    
+  
+  - name: when folding is enabled should omit name of a lone act    
+    when:
+      $result:
+        echo: foo
+    output:
+      $result: foo
+      
+  - name: when object form has single act should omit act name in the output
+    when:
+      $result:
+        echo: foo
+    output:
+      $result: foo
+  
+  - name: when object-form act has multiple steps - shouldInclude act names in the output
+    when:
+      $result:
+        echo: foo
+        ping:
+    output:
+      $result: 
+        echo: foo
+        ping: pong
