@@ -1,0 +1,57 @@
+
+scenarios:
+  - name: allows nesting value form acts
+    when: 
+      repeat:
+        times: 2
+        act: ping
+    output: 
+      repeat: 
+        - pong
+        - pong
+
+  - name: allows nesting object form acts with single act
+    when:
+      repeat:
+        times: 2
+        act: 
+          echo: test
+    output:
+      repeat:
+        - echo: test
+        - echo: test
+         
+  - name: allows nesting object form acts with multiple acts
+    when:
+      repeat:
+        times: 2
+        act:
+          echo: test
+          ping:
+    output:
+      repeat:
+        -
+          echo: test
+          ping: pong
+        -
+          echo: test
+          ping: pong
+
+  - name: allows nesting array form acts
+    when:
+      repeat:
+        times: 2
+        act:
+          - echo: one
+          - echo: two
+          - ping
+    output:
+      repeat:
+        -
+          - echo: one
+          - echo: two
+          - pong
+        -
+          - echo: one
+          - echo: two        
+          - pong

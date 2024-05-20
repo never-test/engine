@@ -1,22 +1,14 @@
 scenarios:
-
-  - name: should allow defining value-form act
-    description: |
-      value-form acts cannot have inputs,
-      this input to act declared in thi form
-      will be null 
-    when: ping
-    output: pong
-  
-  - name: should allow defining object-form act with single step
-    when: 
+  - name: should echo value
+    when:
       echo: one
     output:
       echo: one
-  
+
   - name: should echo object
+    focus: y
     when:
-      echo: 
+      echo:
         foo: bar
         baz: zoo
     output:
@@ -32,36 +24,4 @@ scenarios:
     output:
       echo:
         - foo
-        - bar        
-  - name: should allow defining object-form act with multiple steps
-    when:
-      echo: one
-      ping:
-    output:
-      echo: one
-      ping: pong
-  
-  - name: should allow defining array-form act with value-form steps
-    when:
-      - ping
-      - ping
-    output:
-      - pong
-      - pong
-        
-  - name: should allow defining array-form act with object-form steps containing single act 
-    when:
-      - echo: one
-      - echo: two
-    output:
-      - echo: one
-      - echo: two    
-
-  - name: should allow array-form acts with mixed form steps
-    when:
-      - ping
-      - echo: two
-    output:
-      - pong
-      - echo: two    
-          
+        - bar    
