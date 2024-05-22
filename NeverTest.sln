@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeverTest", "..\src\NeverUnit\NeverTest\NeverTest.csproj", "{34517A7D-2953-465D-B283-AFCE1600C2EB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine", "..\src\NeverUnit\Engine\Engine.csproj", "{34517A7D-2953-465D-B283-AFCE1600C2EB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0C3C1C00-6F68-4676-9C1F-22E8E5AC0A34}"
 EndProject
@@ -9,6 +9,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeverTest.Tests", "tests\NeverTest.Tests\NeverTest.Tests.csproj", "{D13C412C-210E-466B-8332-81FEC7DA866B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSTest", "MSTest\MSTest.csproj", "{304166D1-2ECD-4E20-88F6-5BCB3FCD3087}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scenarios.Yaml", "Scenarios.Yaml\Scenarios.Yaml.csproj", "{3AB8791F-FD97-49C9-AC1B-F6AC2065EBBA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,10 +30,15 @@ Global
 		{304166D1-2ECD-4E20-88F6-5BCB3FCD3087}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{304166D1-2ECD-4E20-88F6-5BCB3FCD3087}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{304166D1-2ECD-4E20-88F6-5BCB3FCD3087}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AB8791F-FD97-49C9-AC1B-F6AC2065EBBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AB8791F-FD97-49C9-AC1B-F6AC2065EBBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AB8791F-FD97-49C9-AC1B-F6AC2065EBBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AB8791F-FD97-49C9-AC1B-F6AC2065EBBA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{34517A7D-2953-465D-B283-AFCE1600C2EB} = {0C3C1C00-6F68-4676-9C1F-22E8E5AC0A34}
 		{D13C412C-210E-466B-8332-81FEC7DA866B} = {227215F4-A638-4671-8579-E35F6AF2B6AD}
 		{304166D1-2ECD-4E20-88F6-5BCB3FCD3087} = {0C3C1C00-6F68-4676-9C1F-22E8E5AC0A34}
+		{3AB8791F-FD97-49C9-AC1B-F6AC2065EBBA} = {0C3C1C00-6F68-4676-9C1F-22E8E5AC0A34}
 	EndGlobalSection
 EndGlobal

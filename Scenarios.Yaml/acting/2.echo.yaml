@@ -1,0 +1,23 @@
+scenarios:
+  - name: should echo value
+    when:
+      echo: one
+    output: one
+
+  - name: should echo object
+    when:
+      echo:
+        foo: bar
+        baz: zoo
+    output:
+      foo: bar
+      baz: zoo
+
+  - name: should echo array
+    when:
+      echo:
+        - foo
+        - bar
+    output:
+      - foo
+      - bar    

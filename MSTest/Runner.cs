@@ -12,7 +12,9 @@ public abstract class Runner<T> where T : IState
     protected async Task Run(Scenario<T> scenario)
     {
         var result = await scenario.Run(CreateState);
-
+        
+        TestContext.WriteLine(result.GetHeader());
+        
         if (!string.IsNullOrEmpty(scenario.Inconclusive))
         {
             Assert.Inconclusive(scenario.Inconclusive);
@@ -27,9 +29,7 @@ public abstract class Runner<T> where T : IState
         {
              ExceptionDispatchInfo.Capture(result.Exception).Throw();
         }
- 
     }
-
     protected abstract Task<T> CreateState();
 
 }

@@ -13,7 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\NeverUnit\NeverTest\NeverTest.csproj" />
+      <ProjectReference Include="..\..\src\NeverUnit\Engine\Engine.csproj" />
     </ItemGroup>
 
 </Project>
