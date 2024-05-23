@@ -9,11 +9,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\NeverUnit\Engine\Engine.csproj" />
+      <EmbeddedResource Include="**\*.yaml" />
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="**\*.yaml" />
+      <ProjectReference Include="..\Engine\Engine.csproj" />
     </ItemGroup>
 
 </Project>

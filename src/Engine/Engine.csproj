@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>NeverTest</RootNamespace>
+        <AssemblyName>NeverTest</AssemblyName>
+    </PropertyGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="NeverTest.MSTest"/>
+        <InternalsVisibleTo Include="NeverTest.Scenarios.Yaml"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
+        <PackageReference Include="FluentAssertions" Version="6.12.0" />
+        <PackageReference Include="FluentAssertions.Json" Version="6.1.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="YamlConvert" Version="2.1.1" />
+        <PackageReference Include="YamlDotNet" Version="13.4.0"/>
+        <PackageReference Include="OneOf" Version="3.0.263"/>
+
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0"/>
+    </ItemGroup>
+
+</Project>
