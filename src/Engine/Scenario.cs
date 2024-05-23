@@ -15,15 +15,15 @@ public record ScenarioOptions
     /// Does not fold named outputs. 
     /// </summary>
     public bool Folding { get; set; } = true;
-    
+
     /// <summary>
     /// Allows referencing output using {{$.OutputName}} construct.
     /// Note that this has impact on performance. 
     /// </summary>
     public bool Refs { get; set; } = false;
-    
+
 }
-public abstract class Scenario 
+public abstract class Scenario
 {
     public required string Name { get; init; }
     public ScenarioOptions Options { get; init; } = new();
@@ -43,7 +43,7 @@ public abstract class Scenario
 }
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class Scenario<T>: Scenario  where T : IState
+public class Scenario<T> : Scenario where T : IState
 {
     public async Task<ScenarioExecutionResult> Run(Func<Task<T>> stateFactory)
     {
@@ -54,16 +54,16 @@ public class Scenario<T>: Scenario  where T : IState
         }
         var state = await ScenarioBuilder<T>
             .States
-            .GetOrAdd(StateKey, async (x)=> await stateFactory())
+            .GetOrAdd(StateKey, async (x) => await stateFactory())
             .ConfigureAwait(false);
- 
+
         var engine = ScenarioBuilder<T>.Engines[EngineId];
-        
+
         await using var provider = engine.Provider.CreateAsyncScope();
 
         var verbosity = Verbosity ?? provider.ServiceProvider.GetRequiredService<IOptions<LoggerFilterOptions>>().Value.MinLevel;
         var log = new InMemoryLogger(verbosity);
-        
+
         var context = new ScenarioContext<T>()
         {
             ScenarioEngine = engine,
@@ -87,7 +87,7 @@ public class Scenario<T>: Scenario  where T : IState
             Scenario = this,
             Logs = log.Logs,
             Exception = exception,
-            Duration =timer.Elapsed 
+            Duration = timer.Elapsed
         };
     }
     protected virtual async Task Run(ScenarioContext<T> context)
@@ -97,8 +97,8 @@ public class Scenario<T>: Scenario  where T : IState
             {nameof(When).ToLower(), When},
             {nameof(Then).ToLower(), Then},
         };
-        
-         await context.ExecuteActToken(When, When.Path, "when");
-         await context.ExecuteAssertToken(Output);
+
+        await context.ExecuteActToken(When, When.Path, "when");
+        await context.ExecuteAssertToken(Output);
     }
 }

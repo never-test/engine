@@ -21,12 +21,12 @@ public class StandardScenarioLoader : IScenarioSetLoader
         var builder = new DeserializerBuilder()
             .WithTypeConverter(new JTokenYamlConverter())
             .WithNamingConvention(UnderscoredNamingConvention.Instance);
-            ;
+        ;
 
         var deserializer = builder.Build();
-        using var reader = new StreamReader(scenarioStream); 
+        using var reader = new StreamReader(scenarioStream);
 
-        var scenarioSet =  deserializer.Deserialize<ScenarioSet<T>>(reader);
+        var scenarioSet = deserializer.Deserialize<ScenarioSet<T>>(reader);
         scenarioSet.Name ??= set;
         return scenarioSet;
     }
@@ -35,7 +35,7 @@ public class StandardScenarioLoader : IScenarioSetLoader
 public static class StandardSet
 {
     private static readonly Dictionary<string, ScenarioSet<State>> _sets;
-    
+
     static StandardSet()
     {
         _sets = LoadSets().ToDictionary(x => x.Name, x => x);
@@ -50,18 +50,18 @@ public static class StandardSet
         var setNames = typeof(StandardSet).Assembly.GetManifestResourceNames();
         foreach (var setName in setNames)
         {
-            yield return loader.Load<State>(setName);;
+            yield return loader.Load<State>(setName); ;
         }
     }
 }
 
 public static class Ext
 {
-    public static ScenarioBuilder<State> UseStandardScenarios(this ScenarioBuilder<State> builder)
+    public static ScenarioBuilder<State> UseStandardScenarioSets(this ScenarioBuilder<State> builder)
     {
         builder.Services.AddOptions<YamlOptions>();
         builder.Services.AddSingleton<IScenarioSetLoader, StandardScenarioLoader>();
-        
+
         return builder;
     }
 }

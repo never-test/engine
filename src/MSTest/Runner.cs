@@ -3,6 +3,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NeverTest.MSTest;
 
+/// <summary>
+/// Scenario runner using default empty state.
+/// Should
+/// </summary>
+public class Runner : Runner<State>
+{
+    protected override Task<State> CreateState() => State.Instance;
+}
 public abstract class Runner<T> where T : IState
 {
 #nullable disable
@@ -12,22 +20,22 @@ public abstract class Runner<T> where T : IState
     protected async Task Run(Scenario<T> scenario)
     {
         var result = await scenario.Run(CreateState);
-        
+
         TestContext.WriteLine(result.GetHeader());
-        
+
         if (!string.IsNullOrEmpty(scenario.Inconclusive))
         {
             Assert.Inconclusive(scenario.Inconclusive);
         }
-        
+
         foreach (var log in result.Logs)
         {
             TestContext.WriteLine(log);
         }
-        
+
         if (result.Exception is not null)
         {
-             ExceptionDispatchInfo.Capture(result.Exception).Throw();
+            ExceptionDispatchInfo.Capture(result.Exception).Throw();
         }
     }
     protected abstract Task<T> CreateState();

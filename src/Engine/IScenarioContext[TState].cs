@@ -1,6 +1,6 @@
 namespace NeverTest;
 
-public interface IScenarioContext<out TState> : IScenarioContext where TState: IState
+public interface IScenarioContext<out TState> : IScenarioContext where TState : IState
 {
     public TState State();
     public ScenarioFrame Frame { get; }

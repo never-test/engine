@@ -5,8 +5,8 @@ namespace NeverTest;
 [DebuggerDisplay(DebugString)]
 public sealed record ScenarioFrame
 {
-    private const string DebugString = "{FrameType} ({Form}) {Path}"; 
-    private const string ValueFrameKey = "__value"; 
+    private const string DebugString = "{FrameType} ({Form}) {Path}";
+    private const string ValueFrameKey = "__value";
     public required ScenarioFrame? Parent { get; init; }
     public ActResult Result { get; private set; } = ActResult.Pending;
     public required FrameType FrameType { get; init; }
@@ -29,11 +29,10 @@ public sealed record ScenarioFrame
             _input = value;
         }
     }
-
     public required string OutputName { get; init; }
     public required string Path { get; init; }
-    public StepInstance Step { get; init; } = StepInstance.NotApplicable;
-    
+    internal StepInstance Step { get;  private init; } = StepInstance.NotApplicable;
+
     private readonly Dictionary<string, ScenarioFrame> _frames = new();
     private readonly JToken? _input;
 
@@ -48,16 +47,16 @@ public sealed record ScenarioFrame
             {
                 Parent = this,
                 FrameType = FrameType.Execution,
-                // TODO: handle edge cases e.g. nulls or other types 
+                // TODO: handle edge cases e.g. nulls or other types
                 TokenName = act,
                 Input = null,
                 OutputName = ValueFrameKey,
                 Path = value.Path,
                 Step = GetStep(act),
             };
-            
+
             _frames.Add(ValueFrameKey, frame);
-            
+
             yield return frame;
         }
 
@@ -68,10 +67,10 @@ public sealed record ScenarioFrame
                 if (property.Name.StartsWith('$'))
                 {
                     var frame = CreateOutputFrame(
-                        property.Name, 
-                        property.Path, 
+                        property.Name,
+                        property.Path,
                         property.Value);
-                    
+
                     yield return frame;
                 }
                 else
@@ -95,7 +94,7 @@ public sealed record ScenarioFrame
         if (Input is JArray arrayForm)
         {
             var index = 0;
-            
+
             foreach (var item in arrayForm)
             {
                 var frame = new ScenarioFrame
@@ -129,7 +128,7 @@ public sealed record ScenarioFrame
     }
 
     public ScenarioFrame CreateOutputFrame(
-        string outputName, 
+        string outputName,
         string path,
         JToken input)
     {
@@ -151,17 +150,17 @@ public sealed record ScenarioFrame
     {
         if (Result != ActResult.Pending) throw new InvalidOperationException("Result already set");
         Result = result;
-        
+
     }
     public JToken BuildOutput(IScenarioContext context)
     {
-        
+
         // TODO: simplify, dont check for,
         if (FrameType is FrameType.Output && Form == Form.Value)
         {
             if (!_frames.TryGetValue(ValueFrameKey, out var frame))
             {
-                return JToken.FromObject(new { Error = "Value frame is not found."});
+                return JToken.FromObject(new { Error = "Value frame is not found." });
             }
             var output = frame.Result.Value;
             if (output is not null)
@@ -173,7 +172,7 @@ public sealed record ScenarioFrame
         {
             if (Result.Status == ExecutionStatus.Executed)
             {
-                if(Result.Value is null) return JValue.CreateNull();
+                if (Result.Value is null) return JValue.CreateNull();
                 return JToken.FromObject(Result.Value);
             }
 
@@ -187,9 +186,9 @@ public sealed record ScenarioFrame
             {
                 return _frames.First().Value.BuildOutput(context);
             }
-            
+
             var result = new JObject();
-            
+
             foreach (var (name, frame) in _frames)
             {
                 result.Add(name, frame.BuildOutput(context));
@@ -197,7 +196,7 @@ public sealed record ScenarioFrame
 
             return result;
         }
-        
+
         if (Form == Form.Array)
         {
             var result = new JArray();
@@ -208,8 +207,8 @@ public sealed record ScenarioFrame
 
             return result;
         }
-        
-        return JToken.FromObject(new{ Error = "Output error"});
+
+        return JToken.FromObject(new { Error = "Output error" });
     }
 
     public override string ToString() => $"{FrameType} ({Form}) {Path} => {OutputName}";

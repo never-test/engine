@@ -17,14 +17,14 @@
         <PackageReference Include="YamlConvert" Version="2.1.1"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\..\MSTest\MSTest.csproj"/>
-        <ProjectReference Include="..\..\Scenarios.Yaml\Scenarios.Yaml.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
+        <ItemGroup>
         <None Update="**\*.yaml">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
+
+        <ItemGroup>
+          <ProjectReference Include="..\..\src\MSTest\MSTest.csproj" />
+          <ProjectReference Include="..\..\src\Scenarios.Yaml\Scenarios.Yaml.csproj" />
+        </ItemGroup>
 </Project>

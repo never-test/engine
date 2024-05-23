@@ -7,5 +7,5 @@ internal static class Extensions
     /// </summary>
     /// <param name="_"></param>
     /// <returns></returns>
-    public static ValueTask End(this object? _)=> ValueTask.CompletedTask;
+    public static ValueTask End(this object? _) => ValueTask.CompletedTask;
 }

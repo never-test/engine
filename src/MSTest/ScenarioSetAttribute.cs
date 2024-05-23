@@ -1,7 +1,5 @@
 using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NeverTest.Yaml;
 
 namespace NeverTest.MSTest;
 
@@ -13,7 +11,7 @@ public abstract class ScenarioSetAttribute<T>(string set) : TestMethodAttribute,
     public IEnumerable<object[]> GetData(MethodInfo methodInfo)
     {
         var engine = Builder.Build();
-        
+
         foreach (var scenario in engine.LoadScenarios<T>(set))
         {
             yield return [scenario];

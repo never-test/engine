@@ -6,8 +6,8 @@ internal sealed class RefReplacer
 {
     public void Replace(JToken act, Func<JToken> output, IScenarioContext context)
     {
-        var outputFactory = new Lazy<JToken>(output); 
-        if(act is JValue v) DoReplace(v, outputFactory);
+        var outputFactory = new Lazy<JToken>(output);
+        if (act is JValue v) DoReplace(v, outputFactory);
 
         var valueNodes = act
             .SelectTokens("$..*")
@@ -42,13 +42,13 @@ internal sealed class RefReplacer
             return false;
         }
 
-        var replaced =  s_matchReplacementToken.Replace(
+        var replaced = s_matchReplacementToken.Replace(
             input,
             match =>
             {
                 var target = $"${match.Groups["path"].Value}";
                 var output = outputFactory.Value;
-                var result = output 
+                var result = output
                                  .SelectToken(target)?
                                  .Value<string>() ??
                              throw new InvalidOperationException($"'{node.Path}' contains step expression '{target}' that could not be resolved ");

@@ -1,6 +1,6 @@
 namespace NeverTest.Acts;
 
-public class Echo : IActStep<JToken>
+public class Echo : IActStep<JToken, IState>
 {
     public Task<object?> Act(JToken input, IScenarioContext<IState> context)
     {

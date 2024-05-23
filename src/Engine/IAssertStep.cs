@@ -1,10 +1,10 @@
 namespace NeverTest;
 using OneOf;
-public interface IAssertStep<in TState> where TState: IState
+public interface IAssertStep<in TState> where TState : IState
 {
     ValueTask Assert(JToken actual, JToken? expected, IScenarioContext<TState> context);
     ValueTask AssertException(Exception exception, JToken expected, IScenarioContext<TState> context) => ValueTask.CompletedTask;
 
 }
 
-public interface IAssertStep: IAssertStep<IState>;
+public interface IAssertStep : IAssertStep<IState>;

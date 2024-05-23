@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 /// where scope is created for a single scenario
 /// </summary>
 
-public record ScenarioContext<T> : IScenarioContext<T> where T: IState
+public record ScenarioContext<T> : IScenarioContext<T> where T : IState
 {
     private int _level = 0;
     public T State() => StateInstance;
@@ -19,7 +19,7 @@ public record ScenarioContext<T> : IScenarioContext<T> where T: IState
     public string Indent => new(' ', Math.Max(Level - 1, 0) * 2);
     public int Level => _level;
     public async Task<ScenarioFrame> ExecuteActToken(
-        JToken input, 
+        JToken input,
         string path,
         string output)
     {
@@ -43,36 +43,36 @@ public record ScenarioContext<T> : IScenarioContext<T> where T: IState
         {
             _currentFrame = _currentFrame.CreateOutputFrame(output, path, input);
         }
-        
+
         var queue = new Queue<ScenarioFrame>();
-        
+
         this.Trace("start #{Level}", Level);
-        this.Trace("str enq {Frame} #{Level}",_currentFrame.ToString(), Level);
-            
+        this.Trace("str enq {Frame} #{Level}", _currentFrame.ToString(), Level);
+
         queue.Enqueue(_currentFrame);
-  
+
         while (queue.Count != 0)
         {
             var next = queue.Dequeue();
-            this.Trace("deq {Frame}",next.ToString());
-            
+            this.Trace("deq {Frame}", next.ToString());
+
             foreach (var frame in next.GetFrames(this))
             {
                 queue.Enqueue(frame);
-                this.Trace("enq {Frame}",frame.ToString());
+                this.Trace("enq {Frame}", frame.ToString());
             }
-            
+
             if (next.FrameType == FrameType.Execution)
             {
-                this.Trace("exc {Frame}",next.ToString());
+                this.Trace("exc {Frame}", next.ToString());
                 await ExecuteAct(next);
             }
         }
 
         this.Trace("end #{Level}", Level);
         var rr = _currentFrame;
-        
-        if(prev is not null)
+
+        if (prev is not null)
         {
             _currentFrame = prev;
         }
@@ -82,7 +82,7 @@ public record ScenarioContext<T> : IScenarioContext<T> where T: IState
     }
 
     public required IServiceProvider Provider { get; init; }
-    
+
     public required ScenarioEngine ScenarioEngine { get; init; }
     public required Scenario Scenario { get; init; }
     public required T StateInstance { get; init; }
@@ -91,7 +91,7 @@ public record ScenarioContext<T> : IScenarioContext<T> where T: IState
     {
         this.Info("-------------------------");
 
-        var root = _currentFrame?? throw new InvalidOperationException("Root frame is null");
+        var root = _currentFrame ?? throw new InvalidOperationException("Root frame is null");
         var output = root.BuildOutput(this);
 
         Log.LogInformation("{Output}", output.ToString());
@@ -102,26 +102,26 @@ public record ScenarioContext<T> : IScenarioContext<T> where T: IState
 
     private ScenarioFrame? _currentFrame;
 
-    public ScenarioFrame Frame => _currentFrame ?? throw new InvalidOperationException("Current scenario frame is not set."); 
-    private  async Task ExecuteAct(ScenarioFrame frame)
+    public ScenarioFrame Frame => _currentFrame ?? throw new InvalidOperationException("Current scenario frame is not set.");
+    private async Task ExecuteAct(ScenarioFrame frame)
     {
         ExecutionStatus status;
         Exception? exception = null;
         object? result = null;
-        
+
         this.Info("{Path}", frame.Path);
         this.Debug("\u21e8 in: {Input}", frame.Input?.ToString(Formatting.None));
-        
+
         try
         {
             var prev = _currentFrame;
             _currentFrame = frame;
-            
+
             ProcessRefs(frame.Input);
             result = await frame.Step.Invocation(frame.Input, this);
-            
+
             _currentFrame = prev;
-            
+
             if (Log.IsEnabled(LogLevel.Trace))
             {
                 var asStr = result is null ? "(null)" : JToken.FromObject(result).ToString(Formatting.None);
@@ -136,14 +136,14 @@ public record ScenarioContext<T> : IScenarioContext<T> where T: IState
             status = ExecutionStatus.Faulted;
             this.Warn("\u26a0 err: act '{Act}' threw {Message}", frame.ToString(), exception.Message);
         }
-        
-        var actResult =  new ActResult
+
+        var actResult = new ActResult
         {
             Status = status,
             Exception = exception,
             Value = result
         };
-        
+
         frame.SetResult(actResult, this);
     }
 
@@ -151,10 +151,10 @@ public record ScenarioContext<T> : IScenarioContext<T> where T: IState
     {
         if (input is null) return;
         if (!Scenario.Options.Refs) return;
-        
+
         // todo: put this somewhere? Provider?
         var replacer = new RefReplacer();
-        replacer.Replace(input, () => _root.BuildOutput(this),this) ;
+        replacer.Replace(input, () => _root.BuildOutput(this), this);
     }
 }
 
@@ -168,9 +168,9 @@ public record ActResult
         Status = ExecutionStatus.Pending
     };
 
-    public  required ExecutionStatus Status { get; init; }
+    public required ExecutionStatus Status { get; init; }
     public required object? Value { get; init; }
-    public required  Exception? Exception { get; set; }
+    public required Exception? Exception { get; set; }
 }
 
 public enum ExecutionStatus
@@ -179,14 +179,14 @@ public enum ExecutionStatus
     Faulted = 2,
     EngineError = 3,
     Ignored = 4,
-    Pending = 5 
+    Pending = 5
 }
 
- public enum FrameType
- {
-     Output = 1,
-     Execution = 2
- }
+public enum FrameType
+{
+    Output = 1,
+    Execution = 2
+}
 
 /// <summary>
 /// Non-generic version of scenario context to be used in non-generic-context steps
@@ -201,7 +201,7 @@ public record ScenarioContext : ScenarioContext<IState>
 public enum Form
 {
     Unknown = 1,
-    Value, 
+    Value,
     Object,
     Array
 }
@@ -215,14 +215,14 @@ public static class ScenarioContextLoggingExtensions
     public static void Warn(this IScenarioContext context, string message, params object?[] args) => context.Write(LogLevel.Warning, message, args);
     private static void Write(this IScenarioContext context,
         LogLevel level,
-        string message, 
+        string message,
         params object?[] args)
     {
-        if(!context.Log.IsEnabled(level)) return;
-        
+        if (!context.Log.IsEnabled(level)) return;
+
         var array = new object[args.Length + 1];
         array[0] = context.Indent;
-        Array.Copy(args,0, array,1, args.Length);
+        Array.Copy(args, 0, array, 1, args.Length);
         var symbol = level switch
         {
             LogLevel.Trace => '#',
@@ -233,7 +233,7 @@ public static class ScenarioContextLoggingExtensions
             _ => ' '
         };
         var msg = $"{symbol}{{Indent}} {message}";
-        
+
 #pragma warning disable CA2254
         // ReSharper disable once TemplateIsNotCompileTimeConstantProblem
         context.Log.Log(level, msg, array);

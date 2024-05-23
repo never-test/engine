@@ -6,9 +6,9 @@ internal class InMemoryLogger(LogLevel minimumLogLevel) : ILogger
     public IEnumerable<string> Logs => _messages.Select(m => m.Item2);
 
     public void Log<TState>(
-        LogLevel logLevel, 
-        EventId eventId, 
-        TState state, 
+        LogLevel logLevel,
+        EventId eventId,
+        TState state,
         Exception? exception,
         Func<TState, Exception?, string> formatter)
     {
@@ -20,7 +20,7 @@ internal class InMemoryLogger(LogLevel minimumLogLevel) : ILogger
 
     public bool IsEnabled(LogLevel logLevel) => true;
 
-       
+
     public IDisposable BeginScope<TState>(TState state) where TState : notnull
     {
         throw new NotImplementedException();
