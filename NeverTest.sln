@@ -10,7 +10,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine", "src\Engine\Engine
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSTest", "src\MSTest\MSTest.csproj", "{2B496D90-BF29-4EE2-9770-CA467EBB1154}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scenarios.Yaml", "src\Scenarios.Yaml\Scenarios.Yaml.csproj", "{7D437B7B-B58F-41B6-AFC7-E6BF355805AB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StandardScenarios.Yaml", "src\StandardScenarios.Yaml\StandardScenarios.Yaml.csproj", "{7D437B7B-B58F-41B6-AFC7-E6BF355805AB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "~", "~", "{253D2820-EADF-4860-A27C-C000B1E9BEEE}"
 EndProject

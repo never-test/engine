@@ -28,8 +28,8 @@ public abstract class Scenario
     public LogLevel? Verbosity { get; init; }
     public string? Describe { get; init; }
     public string? Inconclusive { get; init; }
-
     public bool Focus { get; init; }
+
 #nullable disable
     public string StateKey { get; internal set; }
     public string EngineId { get; internal set; }
@@ -45,7 +45,7 @@ public class Scenario<TState> : Scenario where TState : IState
 {
     public async Task<ScenarioResult> Run(Func<Task<TState>> stateFactory)
     {
-        var timer = Stopwatch.StartNew();
+        var start = Stopwatch.GetTimestamp();
         if (!string.IsNullOrEmpty(Inconclusive))
         {
             return ScenarioResult.CreateInconclusive(Inconclusive, this);
@@ -79,13 +79,13 @@ public class Scenario<TState> : Scenario where TState : IState
         {
             exception = ex;
         }
-        timer.Stop();
+
         return new ScenarioResult
         {
             Scenario = this,
             Logs = log.Logs,
             Exception = exception,
-            Duration = timer.Elapsed
+            Duration = Stopwatch.GetElapsedTime(start)
         };
     }
     protected virtual async Task Run(ScenarioContext<TState> context)

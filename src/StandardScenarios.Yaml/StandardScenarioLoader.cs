@@ -1,4 +1,4 @@
-﻿namespace NeverTest.Scenarios.Yaml;
+﻿namespace NeverTest.StandardScenarios.Yaml;
 
 using NeverTest.Yaml;
 using YamlConverter;

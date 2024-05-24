@@ -25,6 +25,6 @@
 
         <ItemGroup>
           <ProjectReference Include="..\..\src\MSTest\MSTest.csproj" />
-          <ProjectReference Include="..\..\src\Scenarios.Yaml\Scenarios.Yaml.csproj" />
+          <ProjectReference Include="..\..\src\StandardScenarios.Yaml\StandardScenarios.Yaml.csproj" />
         </ItemGroup>
 </Project>

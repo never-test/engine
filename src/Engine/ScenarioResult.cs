@@ -24,6 +24,7 @@ public class ScenarioResult
         $"""
          Scenario: {Scenario.Name}
          Duration: {Duration}
+         {Scenario.Describe}
          """;
 
     public void Assert()

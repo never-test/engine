@@ -1,6 +1,6 @@
-namespace NeverTest.Tests;
+using NeverTest.StandardScenarios.Yaml;
 
-using NeverTest.Scenarios.Yaml;
+namespace NeverTest.Tests;
 
 [TestClass]
 public class Scenarios : Runner

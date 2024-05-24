@@ -14,7 +14,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Engine\Engine.csproj" />
-      <ProjectReference Include="..\Scenarios.Yaml\Scenarios.Yaml.csproj" />
+      <ProjectReference Include="..\StandardScenarios.Yaml\StandardScenarios.Yaml.csproj" />
     </ItemGroup>
 
     <ItemGroup>

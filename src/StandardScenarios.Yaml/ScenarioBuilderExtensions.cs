@@ -1,7 +1,7 @@
-namespace NeverTest.Scenarios.Yaml;
+namespace NeverTest.StandardScenarios.Yaml;
 
-using Microsoft.Extensions.DependencyInjection;
 using NeverTest.Yaml;
+using Microsoft.Extensions.DependencyInjection;
 
 public static class ScenarioBuilderExtensions
 {

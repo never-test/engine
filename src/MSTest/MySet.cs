@@ -1,7 +1,8 @@
+using NeverTest.StandardScenarios.Yaml;
+
 namespace NeverTest.MSTest;
 
 using Microsoft.Extensions.Logging;
-using NeverTest.Scenarios.Yaml;
 
 public class StandardSetAttribute : ScenarioSetAttribute<State>
 {

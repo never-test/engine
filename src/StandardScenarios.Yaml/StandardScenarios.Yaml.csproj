@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <AssemblyName>NeverTest.Scenarios.Yaml</AssemblyName>
-        <RootNamespace>NeverTest.Scenarios.Yaml</RootNamespace>
+        <AssemblyName>NeverTest.StandardScenarios.Yaml</AssemblyName>
+        <RootNamespace>NeverTest.StandardScenarios.Yaml</RootNamespace>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>

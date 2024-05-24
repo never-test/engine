@@ -1,4 +1,4 @@
-using NeverTest.Scenarios.Yaml;
+using NeverTest.StandardScenarios.Yaml;
 
 namespace NeverTest.Tests;
 
@@ -41,6 +41,5 @@ public class ManualExecutionTests
             .Run(() => State.Instance);
 
         result.Assert();
-
     }
 }
