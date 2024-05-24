@@ -1,6 +1,5 @@
 namespace NeverTest.Building;
 
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 
 public class ActBuilder<TState>(ScenarioBuilder<TState> builder) where TState : IState

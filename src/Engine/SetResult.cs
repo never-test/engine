@@ -1,4 +1,3 @@
-using FluentAssertions;
 using FluentAssertions.Execution;
 
 namespace NeverTest;

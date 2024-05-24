@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 namespace NeverTest.Scenarios.Yaml;
 
 /// <summary>

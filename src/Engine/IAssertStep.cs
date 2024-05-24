@@ -1,5 +1,5 @@
 namespace NeverTest;
-using OneOf;
+
 public interface IAssertStep<in TState> where TState : IState
 {
     ValueTask Assert(JToken actual, JToken? expected, IScenarioContext<TState> context);
