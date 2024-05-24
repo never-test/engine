@@ -9,7 +9,8 @@ public class ScenarioEngine
     public required IServiceProvider Provider { get; init; }
     internal IReadOnlyDictionary<ActKey, StepInstance> Acts { get; init; } = null!;
 
-    public IEnumerable<Scenario<T>> LoadScenarios<T>(string path) where T : IState
+
+    public ScenarioSet<T> LoadSet<T>(string path) where T : IState
     {
         var loader = Provider.GetRequiredService<IScenarioSetLoader>();
 
@@ -18,12 +19,19 @@ public class ScenarioEngine
 
         var focused = set.Scenarios.Where(x => x.Focus).ToArray();
 
+        var scenarios = new List<Scenario<T>>();
         foreach (var scenario in focused.Length > 0 ? focused : set.Scenarios)
         {
             scenario.StateKey = key;
             scenario.EngineId = EngineId;
 
-            yield return scenario;
+            scenarios.Add(scenario);
         }
+
+        return new ScenarioSet<T>
+        {
+            Name = set.Name ?? path,
+            Scenarios = scenarios.ToArray()
+        };
     }
 }

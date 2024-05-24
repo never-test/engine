@@ -15,7 +15,7 @@ public class Repeat : IActStep<JObject, IState>
         var result = new JArray();
         for (int i = 0; i < times; i++)
         {
-            var frame = await context.ExecuteActToken(act, act.Path, i.ToString());
+            var frame = await context.ExecuteActToken(act, i.ToString());
             result.Add(frame.BuildOutput(context) ?? JValue.CreateNull());
         }
 

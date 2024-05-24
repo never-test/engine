@@ -8,7 +8,7 @@ namespace NeverTest.Yaml;
 public class YamlLoader(IOptions<YamlOptions> options) : IScenarioSetLoader
 {
     private readonly YamlOptions _options = options.Value;
-    public ScenarioSet<T> Load<T>(string set) where T : IState
+    public ScenarioSetBase<T> Load<T>(string set) where T : IState
     {
         var builder = new DeserializerBuilder()
            .WithTypeConverter(new JTokenYamlConverter())
@@ -17,7 +17,7 @@ public class YamlLoader(IOptions<YamlOptions> options) : IScenarioSetLoader
         _options?.Customize?.Invoke(builder);
         var deserializer = builder.Build();
         var plain = File.ReadAllText(set);
-        var scenarioSet = deserializer.Deserialize<ScenarioSet<T>>(plain);
+        var scenarioSet = deserializer.Deserialize<ScenarioSetBase<T>>(plain);
         scenarioSet.Name ??= set;
         return scenarioSet;
     }

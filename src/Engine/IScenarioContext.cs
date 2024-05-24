@@ -8,7 +8,7 @@ public interface IScenarioContext
     /// <summary>
     /// Returns instance of the configured engine for current scenario.
     /// </summary>
-    ScenarioEngine ScenarioEngine { get; init; }
+    ScenarioEngine Engine { get; init; }
 
     /// <summary>
     /// Gets scenario instance.  

@@ -1,8 +1,10 @@
+using FluentAssertions;
+
 namespace NeverTest;
 
-public class ScenarioExecutionResult
+public class ScenarioResult
 {
-    public static ScenarioExecutionResult CreateInconclusive(string reason, Scenario scenario) => new()
+    public static ScenarioResult CreateInconclusive(string reason, Scenario scenario) => new()
     {
         Inconclusive = reason,
         Exception = null,
@@ -23,4 +25,9 @@ public class ScenarioExecutionResult
          Scenario: {Scenario.Name}
          Duration: {Duration}
          """;
+
+    public void Assert()
+    {
+        Exception.Should().BeNull("scenario {0} was expected not to result in exception");
+    }
 }

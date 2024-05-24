@@ -3,7 +3,7 @@ namespace NeverTest.Building;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 
-public class ActBuilder<TState> (ScenarioBuilder<TState> builder) where TState : IState
+public class ActBuilder<TState>(ScenarioBuilder<TState> builder) where TState : IState
 {
     private readonly Dictionary<ActKey, StepInstance> _acts = new();
     internal IReadOnlyDictionary<ActKey, StepInstance> Instances => _acts;
@@ -20,7 +20,7 @@ public class ActBuilder<TState> (ScenarioBuilder<TState> builder) where TState :
         var step = new StepInstance
         {
             Invocation = async (input, sc) => await sc
-                .ScenarioEngine
+                .Engine
                 .Provider
                 .GetRequiredService<TAct>()
                 .Act(input != null ? Convert<TInput>(input) : default!, (IScenarioContext<TState>)sc),

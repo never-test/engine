@@ -12,13 +12,13 @@ public record ScenarioOptions
     /// Enables folding.
     /// If output object has single value - simplifies by
     /// omitting act name.
-    /// Does not fold named outputs. 
+    /// Does not fold named outputs.
     /// </summary>
     public bool Folding { get; set; } = true;
 
     /// <summary>
     /// Allows referencing output using {{$.OutputName}} construct.
-    /// Note that this has impact on performance. 
+    /// Note that this has impact on performance.
     /// </summary>
     public bool Refs { get; set; } = false;
 
@@ -43,30 +43,30 @@ public abstract class Scenario
 }
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class Scenario<T> : Scenario where T : IState
+public class Scenario<TState> : Scenario where TState : IState
 {
-    public async Task<ScenarioExecutionResult> Run(Func<Task<T>> stateFactory)
+    public async Task<ScenarioResult> Run(Func<Task<TState>> stateFactory)
     {
         var timer = Stopwatch.StartNew();
         if (!string.IsNullOrEmpty(Inconclusive))
         {
-            return ScenarioExecutionResult.CreateInconclusive(Inconclusive, this);
+            return ScenarioResult.CreateInconclusive(Inconclusive, this);
         }
-        var state = await ScenarioBuilder<T>
+        var state = await ScenarioBuilder<TState>
             .States
             .GetOrAdd(StateKey, async (x) => await stateFactory())
             .ConfigureAwait(false);
 
-        var engine = ScenarioBuilder<T>.Engines[EngineId];
+        var engine = ScenarioBuilder<TState>.Engines[EngineId];
 
         await using var provider = engine.Provider.CreateAsyncScope();
 
         var verbosity = Verbosity ?? provider.ServiceProvider.GetRequiredService<IOptions<LoggerFilterOptions>>().Value.MinLevel;
         var log = new InMemoryLogger(verbosity);
 
-        var context = new ScenarioContext<T>()
+        var context = new ScenarioContext<TState>()
         {
-            ScenarioEngine = engine,
+            Engine = engine,
             StateInstance = state,
             Provider = provider.ServiceProvider,
             Log = log,
@@ -82,7 +82,7 @@ public class Scenario<T> : Scenario where T : IState
             exception = ex;
         }
         timer.Stop();
-        return new ScenarioExecutionResult
+        return new ScenarioResult
         {
             Scenario = this,
             Logs = log.Logs,
@@ -90,7 +90,7 @@ public class Scenario<T> : Scenario where T : IState
             Duration = timer.Elapsed
         };
     }
-    protected virtual async Task Run(ScenarioContext<T> context)
+    protected virtual async Task Run(ScenarioContext<TState> context)
     {
         _ = new JObject
         {
@@ -98,7 +98,7 @@ public class Scenario<T> : Scenario where T : IState
             {nameof(Then).ToLower(), Then},
         };
 
-        await context.ExecuteActToken(When, When.Path, "when");
+        await context.ExecuteActToken(When, "when");
         await context.ExecuteAssertToken(Output);
     }
 }

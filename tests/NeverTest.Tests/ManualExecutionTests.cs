@@ -11,21 +11,18 @@ public class ManualExecutionTests
     [TestMethod]
     public async Task Should_run_all_predefined_scenarios_manually()
     {
-        var builder = new ScenarioBuilder<State>()
+        var engine = new ScenarioBuilder<State>()
             .UseDefaultEngine()
-            .UseStandardScenarioSets();
+            .UseStandardScenarioSets()
+            .Build();
 
-        var engine = builder.Build();
-
-        foreach (var setName in StandardSet.Names())
+        foreach (var setName in Sets.All)
         {
-            var set = engine.LoadScenarios<State>(setName);
+            var result = await engine
+                .LoadSet<State>(setName)
+                .Run(() => State.Instance);
 
-            foreach (var scenario in set)
-            {
-                var result = await scenario.Run(() => State.Instance);
-                result.Exception.Should().BeNull();
-            }
+            result.Assert();
         }
     }
 
@@ -39,18 +36,14 @@ public class ManualExecutionTests
     [DataRow(Sets.Folding)]
     public async Task Should_run_predefined_set(string name)
     {
-        var builder = new ScenarioBuilder<State>()
+        var result = await new ScenarioBuilder<State>()
             .UseDefaultEngine()
-            .UseStandardScenarioSets();
+            .UseStandardScenarioSets()
+            .Build()
+            .LoadSet<State>(name)
+            .Run(() => State.Instance);
 
-        var engine = builder.Build();
+        result.Assert();
 
-        var set = engine.LoadScenarios<State>(name);
-
-        foreach (var scenario in set)
-        {
-            var result = await scenario.Run(() => State.Instance);
-            result.Exception.Should().BeNull();
-        }
     }
 }

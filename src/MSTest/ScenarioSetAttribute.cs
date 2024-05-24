@@ -1,9 +1,9 @@
+namespace NeverTest.MSTest;
+
 using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace NeverTest.MSTest;
-
-public abstract class ScenarioSetAttribute<T>(string set) : TestMethodAttribute, ITestDataSource
+public abstract class ScenarioSetAttribute<T>(string path) : TestMethodAttribute, ITestDataSource
     where T : IState
 {
     protected ScenarioBuilder<T> Builder { get; init; } = new();
@@ -12,7 +12,9 @@ public abstract class ScenarioSetAttribute<T>(string set) : TestMethodAttribute,
     {
         var engine = Builder.Build();
 
-        foreach (var scenario in engine.LoadScenarios<T>(set))
+        var set = engine.LoadSet<T>(path);
+
+        foreach (var scenario in set.Scenarios)
         {
             yield return [scenario];
         }

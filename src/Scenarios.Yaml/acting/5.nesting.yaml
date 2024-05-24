@@ -1,11 +1,11 @@
 
 scenarios:
   - name: allows nesting value form acts
-    when: 
+    when:
       repeat:
         times: 2
         act: ping
-    output: 
+    output:
       - pong
       - pong
 
@@ -13,12 +13,12 @@ scenarios:
     when:
       repeat:
         times: 2
-        act: 
+        act:
           echo: test
     output:
       - test
       - test
-         
+
   - name: allows nesting object form acts with multiple acts
     when:
       repeat:
@@ -47,5 +47,5 @@ scenarios:
         - pong
       -
         - one
-        - two        
+        - two
         - pong

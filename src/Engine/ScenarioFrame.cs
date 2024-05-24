@@ -31,7 +31,7 @@ public sealed record ScenarioFrame
     }
     public required string OutputName { get; init; }
     public required string Path { get; init; }
-    internal StepInstance Step { get;  private init; } = StepInstance.NotApplicable;
+    internal StepInstance Step { get; private init; } = StepInstance.NotApplicable;
 
     private readonly Dictionary<string, ScenarioFrame> _frames = new();
     private readonly JToken? _input;
@@ -68,7 +68,6 @@ public sealed record ScenarioFrame
                 {
                     var frame = CreateOutputFrame(
                         property.Name,
-                        property.Path,
                         property.Value);
 
                     yield return frame;
@@ -117,7 +116,7 @@ public sealed record ScenarioFrame
 
         StepInstance GetStep(string name)
         {
-            if (!context.ScenarioEngine.Acts.TryGetValue(new ActKey(name), out var step))
+            if (!context.Engine.Acts.TryGetValue(new ActKey(name), out var step))
             {
                 // TODO: rewrite without throwing to support validation phase..
                 throw new InvalidOperationException($"Step '{step}' not found");
@@ -129,7 +128,6 @@ public sealed record ScenarioFrame
 
     public ScenarioFrame CreateOutputFrame(
         string outputName,
-        string path,
         JToken input)
     {
         var frame = new ScenarioFrame
@@ -138,7 +136,7 @@ public sealed record ScenarioFrame
             FrameType = FrameType.Output,
             Input = input,
             OutputName = outputName,
-            Path = path,
+            Path = input.Path,
             Step = StepInstance.NotApplicable
         };
 

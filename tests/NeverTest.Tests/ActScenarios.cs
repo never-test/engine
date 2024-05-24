@@ -25,5 +25,5 @@ public class Scenarios : Runner
 
     [StandardSet(Sets.Advanced)]
     public Task Advanced(Scenario<State> s) => Run(s);
-    
+
 }

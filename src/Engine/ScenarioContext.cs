@@ -18,9 +18,7 @@ public record ScenarioContext<T> : IScenarioContext<T> where T : IState
     private ScenarioFrame _root = null!;
     public string Indent => new(' ', Math.Max(Level - 1, 0) * 2);
     public int Level => _level;
-    public async Task<ScenarioFrame> ExecuteActToken(
-        JToken input,
-        string path,
+    public async Task<ScenarioFrame> ExecuteActToken(JToken input,
         string output)
     {
         _level++;
@@ -41,7 +39,7 @@ public record ScenarioContext<T> : IScenarioContext<T> where T : IState
         }
         else
         {
-            _currentFrame = _currentFrame.CreateOutputFrame(output, path, input);
+            _currentFrame = _currentFrame.CreateOutputFrame(output, input);
         }
 
         var queue = new Queue<ScenarioFrame>();
@@ -83,7 +81,7 @@ public record ScenarioContext<T> : IScenarioContext<T> where T : IState
 
     public required IServiceProvider Provider { get; init; }
 
-    public required ScenarioEngine ScenarioEngine { get; init; }
+    public required ScenarioEngine Engine { get; init; }
     public required Scenario Scenario { get; init; }
     public required T StateInstance { get; init; }
 
