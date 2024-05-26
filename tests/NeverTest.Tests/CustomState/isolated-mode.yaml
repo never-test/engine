@@ -4,7 +4,10 @@ state:
   counter: 663
 
 scenarios:
-  - name: this scenario should create first instance of state
+  - name: this scenario should create (first) instance of state
+    describe: |
+      by `MyRunner`. `increment` is custom act that calls method on
+      custom state which increments `counter` value.
     when:
       $a: increment
       $result: state
@@ -13,7 +16,7 @@ scenarios:
       $result:
         Counter: 664
 
-  - name: this scenario should create second instance of state
+  - name: this scenario should create second instance of state this value should reset
     when:
       $a: increment
       $b: increment

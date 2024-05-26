@@ -3,7 +3,6 @@ namespace NeverTest.Tests.CustomState;
 [TestClass]
 public class MyScenarios: MyRunner
 {
-
     [MySet("CustomState/usage.yaml")]
     public Task DefaultUsage(Scenario<MyScenarioState> scenario) => Run(scenario);
 
