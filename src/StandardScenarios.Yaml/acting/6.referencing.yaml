@@ -1,54 +1,58 @@
+options:
+  refs: true
 
 scenarios:
   - name: should allow referencing value
-    options:
-      refs: true
     when:
-      $var: 
+      $var:
         echo: test
-      $result: 
-        echo: this {$var} is awesome!
-    output: 
+      $result:
+        echo: this _{$var} is awesome!
+    output:
       $var: test
       $result: this test is awesome!
 
-  - name: should allow referencing object
+  - name: should allow turning off refs at scenarios level
     options:
-      refs: true
+      refs: false
+    when:
+      $var: ping
+      $result:
+        echo: _{$var}
+    output:
+      $var: pong
+      $result: _{$var}
+
+  - name: should allow referencing object
     when:
       $var:
-        echo: 
+        echo:
           foo: test
           bar: awesome
-      $result: 
-        echo: this {$var.foo} is {$var.bar}!
+      $result:
+        echo: this _{$var.foo} is _{$var.bar}!
     output:
       $var:
         foo: test
         bar: awesome
       $result: this test is awesome!
-  
+
   - name: should allow referencing arrays
-    options:
-      refs: true
     when:
       $var:
         echo:
           - test
           - awesome
       $result:
-        echo: this {$var[0]} is {$var[1]}!
+        echo: this _{$var[0]} is _{$var[1]}!
     output:
       $var:
         - test
         - awesome
-      $result: this test is awesome!        
-  
+      $result: this test is awesome!
+
   - name: should allow referencing nested vars
-    inconclusive: order of execution??
-    focus: true
-    options:
-      refs: true
+    inconclusive: not supporting nesting vars atm..
     when:
       $var:
         $nest:
@@ -56,26 +60,73 @@ scenarios:
             - test
             - awesome
       $result:
-        echo: this {$var.$nest[0]} is {$var.nest[1]}!
+        echo: this _{$var.$nest[0]} is {$var.nest[1]}!
     output:
       $var:
         $nest:
           - test
           - awesome
-      $result: this test is awesome!      
+      $result: this test is awesome!
 
-  - name: should allow referencing token
-    inconclusive: todo
-    options:
-      refs: true
+  - name: should allow referencing whole token
     when:
       $var:
         echo: test
-        ping: 
+        ping:
       $result:
-        echo: {$var}
+        echo: _{$var}
     output:
-      $var: test
-      $result: 
+      $var:
         echo: test
         ping: pong
+      $result:
+        echo: test
+        ping: pong
+
+  - name: should allow referencing inside array
+    when:
+      $var: ping
+      $result:
+        echo:
+         - value
+         - _{$var}
+         - _{$var}
+    output:
+      $var: pong
+      $result:
+        - value
+        - pong
+        - pong
+
+  - name: should allow referencing inside object
+    when:
+      $var: ping
+      $result:
+        echo:
+          foo: _{$var}
+          bar: _{$var}
+          zoo:
+            - _{$var}
+            - _{$var}
+    output:
+      $var: pong
+      $result:
+        foo: pong
+        bar: pong
+        zoo:
+          - pong
+          - pong
+
+  - name: should allow referencing referenced outputs
+    when:
+      $var: ping
+      $ref:
+        echo:
+          foo: _{$var}
+      $ref-ref:
+        echo: ping _{$ref.foo}!
+    output:
+      $var: pong
+      $ref:
+        foo: pong
+      $ref-ref: ping pong!

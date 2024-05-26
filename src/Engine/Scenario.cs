@@ -12,13 +12,13 @@ public record ScenarioOptions
     /// omitting act name.
     /// Does not fold named outputs.
     /// </summary>
-    public bool Folding { get; set; } = true;
+    public bool? Folding { get; set; }
 
     /// <summary>
     /// Allows referencing output using {{$.OutputName}} construct.
     /// Note that this has impact on performance.
     /// </summary>
-    public bool Refs { get; set; } = false;
+    public bool? Refs { get; set; }
 
 }
 public abstract class Scenario

@@ -114,9 +114,8 @@ public record ScenarioContext<T> : IScenarioContext<T> where T : IState
         {
             var prev = _currentFrame;
             _currentFrame = frame;
-
-            ProcessRefs(frame.Input);
-            result = await frame.Step.Invocation(frame.Input, this);
+            var input  = ProcessRefs(frame.Input);
+            result = await frame.Step.Invocation(input, this);
 
             _currentFrame = prev;
 
@@ -145,14 +144,15 @@ public record ScenarioContext<T> : IScenarioContext<T> where T : IState
         frame.SetResult(actResult, this);
     }
 
-    private void ProcessRefs(JToken? input)
+    private JToken? ProcessRefs(JToken? input)
     {
-        if (input is null) return;
-        if (!Scenario.Options.Refs) return;
+        if (input is null) return input;
+        if (!(Scenario.Options.Refs ?? Scenario.SetOptions.Refs)) return input;
 
         // todo: put this somewhere? Provider?
         var replacer = new RefReplacer();
-        replacer.Replace(input, () => _root.BuildOutput(this), this);
+        var output = _root.BuildOutput(this);
+        return replacer.Replace(input, output, this);
     }
 }
 

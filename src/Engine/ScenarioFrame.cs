@@ -174,7 +174,9 @@ public sealed record ScenarioFrame
         if (Form == Form.Object)
         {
             if (_frames.Count == 1 &&
-                context.Scenario.Options.Folding &&
+                (context.Scenario.Options.Folding
+                ?? context.Scenario.SetOptions.Folding)
+                &&
                 !_frames.Single().Key.StartsWith('$'))
             {
                 return _frames.First().Value.BuildOutput(context);

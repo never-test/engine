@@ -1,63 +1,76 @@
 using System.Text.RegularExpressions;
+using FluentAssertions.Equivalency;
 
 namespace NeverTest;
 
 internal sealed class RefReplacer
 {
-    public void Replace(JToken act, Func<JToken> output, IScenarioContext context)
+    private const string Marker = "_{";
+
+    public JToken? Replace(JToken actInput, JToken output, IScenarioContext context)
     {
-        var outputFactory = new Lazy<JToken>(output);
-        if (act is JValue v) DoReplace(v, outputFactory);
-
-        var valueNodes = act
-            .SelectTokens("$..*")
-            .OfType<JValue>()
-            .Where(t => t.Value is string s && s.Contains("${{"))
-            .ToList();
-
-        var candidates = valueNodes.Count;
-        var actualCount = 0;
-
-        foreach (var node in valueNodes)
+        if (actInput is JValue v)
         {
-            if (DoReplace(node, outputFactory))
-            {
-                actualCount++;
-            }
+            return DoReplace(v, output, context);
         }
 
-        // context.Log.LogTrace(
-        //     "Replacement: Candidates = {CandidateCount} Replaced = {ReplacedCount}",
-        //     candidates,
-        //     actualCount);
+        if (actInput is JArray ja)
+        {
+            var array = new JArray();
+            foreach (var token in ja.Children())
+            {
+                array.Add(Replace(token, output, context) ?? JValue.CreateNull());
+            }
+
+            return array;
+        }
+
+        if (actInput is JObject jo)
+        {
+            var obj = new JObject();
+
+            foreach (var (prop, token) in jo)
+            {
+                var replaced = token is not null ? Replace(token, output, context) : token;
+                obj.Add(prop, replaced);
+            }
+
+            return obj;
+        }
+
+        return actInput;
     }
 
-    private static readonly Regex s_matchReplacementToken = new(@"{\$(?'path'[^\}]+)\}");
+    private static readonly Regex s_matchAnyRef = new(Marker + @"\$(?'path'[^\}]+)\}");
+    private static readonly Regex s_matchSingleRef = new("^"+ Marker + @"\$(?'path'[^\}]+)\}$");
 
-    private static bool DoReplace(JValue node, Lazy<JToken> outputFactory)
+    private JToken? DoReplace(JValue node, JToken output, IScenarioContext context)
     {
-
+        context.Trace("ref: {path}", node.Path);
         if (node.Value is not string input)
         {
-            return false;
+            return node;
         }
 
-        var replaced = s_matchReplacementToken.Replace(
+        var singleTokenMatch = s_matchSingleRef.Match(input);
+        if (singleTokenMatch.Success)
+        {
+            var targetPath = $"${singleTokenMatch.Groups["path"].Value}";
+            return output.SelectToken(targetPath)?.DeepClone();;
+        }
+
+        var replaced = s_matchAnyRef.Replace(
             input,
             match =>
             {
-                var target = $"${match.Groups["path"].Value}";
-                var output = outputFactory.Value;
-                var result = output
-                                 .SelectToken(target)?
-                                 .Value<string>() ??
-                             throw new InvalidOperationException($"'{node.Path}' contains step expression '{target}' that could not be resolved ");
-
-                // context.Log.LogTrace("Replace: {Target} ⇒ {Value}", target, result);
-                return result;
+                var targetPath = $"${match.Groups["path"].Value}";
+                return output
+                           .SelectToken(targetPath)?
+                           .Value<string>() ??
+                       throw new InvalidOperationException($"'{node.Path}' contains step expression '{targetPath}' that could not be resolved ");
             });
 
-        node.Value = replaced;
-        return replaced != input;
+             node.Value = replaced;
+             return node;
     }
 }
