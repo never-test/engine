@@ -24,6 +24,8 @@ public class ScenarioEngine
         {
             scenario.StateKey = key;
             scenario.EngineId = EngineId;
+            scenario.SetOptions = set.Options;
+            scenario.State = set.State;
 
             scenarios.Add(scenario);
         }

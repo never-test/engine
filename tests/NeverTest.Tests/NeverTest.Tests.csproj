@@ -21,10 +21,30 @@
         <None Update="**\*.yaml">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+        <None Remove="bin\**" />
+        <None Remove="obj\**" />
     </ItemGroup>
 
         <ItemGroup>
           <ProjectReference Include="..\..\src\MSTest\MSTest.csproj" />
           <ProjectReference Include="..\..\src\StandardScenarios.Yaml\StandardScenarios.Yaml.csproj" />
+        </ItemGroup>
+
+        <ItemGroup>
+          <Content Include="**\*.yaml">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          </Content>
+          <Content Remove="bin\**" />
+          <Content Remove="obj\**" />
+        </ItemGroup>
+
+        <ItemGroup>
+          <Compile Remove="bin\**" />
+          <Compile Remove="obj\**" />
+        </ItemGroup>
+
+        <ItemGroup>
+          <EmbeddedResource Remove="bin\**" />
+          <EmbeddedResource Remove="obj\**" />
         </ItemGroup>
 </Project>

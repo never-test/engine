@@ -1,7 +1,6 @@
-using NeverTest.StandardScenarios.Yaml;
-
 namespace NeverTest.MSTest;
 
+using NeverTest.StandardScenarios.Yaml;
 using Microsoft.Extensions.Logging;
 
 public class StandardSetAttribute : ScenarioSetAttribute<State>
@@ -14,3 +13,4 @@ public class StandardSetAttribute : ScenarioSetAttribute<State>
             .Verbosity(LogLevel.Debug);
     }
 }
+

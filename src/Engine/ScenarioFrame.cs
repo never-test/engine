@@ -11,7 +11,6 @@ public sealed record ScenarioFrame
     public ActResult Result { get; private set; } = ActResult.Pending;
     public required FrameType FrameType { get; init; }
     public Form Form { get; private set; }
-    public string? TokenName { get; private set; }
 
     public required JToken? Input
     {
@@ -42,17 +41,15 @@ public sealed record ScenarioFrame
 
         if (Input is JValue value)
         {
-            var act = value.Value<string>()!;
+            var act = ActKey.FromString(value.Value<string>()!);
             var frame = new ScenarioFrame
             {
                 Parent = this,
                 FrameType = FrameType.Execution,
-                // TODO: handle edge cases e.g. nulls or other types
-                TokenName = act,
                 Input = null,
                 OutputName = ValueFrameKey,
                 Path = value.Path,
-                Step = GetStep(act),
+                Step = GetStep(act, Input.Path),
             };
 
             _frames.Add(ValueFrameKey, frame);
@@ -78,12 +75,12 @@ public sealed record ScenarioFrame
                     {
                         Parent = this,
                         FrameType = FrameType.Execution,
-                        TokenName = property.Name,
                         Input = property.Value,
                         OutputName = property.Name,
                         Path = property.Path,
-                        Step = GetStep(property.Name)
+                        Step = GetStep(ActKey.FromString(property.Name), property.Path)
                     };
+
                     _frames.Add(frame.OutputName, frame);
                     yield return frame;
                 }
@@ -100,7 +97,6 @@ public sealed record ScenarioFrame
                 {
                     Parent = this,
                     FrameType = FrameType.Output,
-                    TokenName = index.ToString(),
                     Input = item,
                     OutputName = index.ToString(),
                     Path = item.Path,
@@ -114,12 +110,12 @@ public sealed record ScenarioFrame
 
         yield break;
 
-        StepInstance GetStep(string name)
+        StepInstance GetStep(ActKey key, string path)
         {
-            if (!context.Engine.Acts.TryGetValue(new ActKey(name), out var step))
+            if (!context.Engine.Acts.TryGetValue(key, out var step))
             {
                 // TODO: rewrite without throwing to support validation phase..
-                throw new InvalidOperationException($"Step '{step}' not found");
+                throw new InvalidOperationException($"Act '{key}' is not recognized at {path}. Please make sure it is registered with the engine.");
             }
 
             return step;
@@ -152,8 +148,6 @@ public sealed record ScenarioFrame
     }
     public JToken BuildOutput(IScenarioContext context)
     {
-
-        // TODO: simplify, dont check for,
         if (FrameType is FrameType.Output && Form == Form.Value)
         {
             if (!_frames.TryGetValue(ValueFrameKey, out var frame))
@@ -176,6 +170,7 @@ public sealed record ScenarioFrame
 
             return JValue.CreateNull();
         }
+
         if (Form == Form.Object)
         {
             if (_frames.Count == 1 &&
@@ -206,7 +201,7 @@ public sealed record ScenarioFrame
             return result;
         }
 
-        return JToken.FromObject(new { Error = "Output error" });
+        throw new InvalidOperationException("Output error. Most likely a bug.");
     }
 
     public override string ToString() => $"{FrameType} ({Form}) {Path} => {OutputName}";

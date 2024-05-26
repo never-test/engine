@@ -5,14 +5,17 @@ namespace NeverTest;
 public class ScenarioSetBase<TState> where TState : IState
 {
     public string? Name { get; internal set; }
+    public SetOptions Options { get; init; } = new();
     public required Scenario<TState>[] Scenarios { get; init; }
+
+    public JToken? State { get; init; }
 }
 
 public class ScenarioSet<TState> : ScenarioSetBase<TState> where TState : IState
 {
     public new required string Name { get; set; }
 
-    public async Task<SetResult> Run(Func<Task<TState>> stateFactory)
+    public async Task<SetResult> Run(Func<JToken?, Task<TState>> stateFactory)
     {
         var start = Stopwatch.GetTimestamp();
         var results = new List<ScenarioResult>(Scenarios.Length);
@@ -29,4 +32,14 @@ public class ScenarioSet<TState> : ScenarioSetBase<TState> where TState : IState
             Duration = Stopwatch.GetElapsedTime(start)
         };
     }
+}
+
+
+public class SetOptions
+{
+    /// <summary>
+    /// Sets value that controls whether state
+    /// is created per set or per scenario.
+    /// </summary>
+    public StateMode Mode { get; init; } = StateMode.Isolated;
 }

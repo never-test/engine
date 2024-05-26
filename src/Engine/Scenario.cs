@@ -33,6 +33,9 @@ public abstract class Scenario
 #nullable disable
     public string StateKey { get; internal set; }
     public string EngineId { get; internal set; }
+    public SetOptions SetOptions { get; internal set; }
+
+    internal JToken State { get; set; }
 #nullable enable
 
     public required JToken When { get; init; }
@@ -43,17 +46,23 @@ public abstract class Scenario
 // ReSharper disable once ClassNeverInstantiated.Global
 public class Scenario<TState> : Scenario where TState : IState
 {
-    public async Task<ScenarioResult> Run(Func<Task<TState>> stateFactory)
+    public async Task<ScenarioResult> Run(Func<JToken?, Task<TState>> stateFactory)
     {
         var start = Stopwatch.GetTimestamp();
         if (!string.IsNullOrEmpty(Inconclusive))
         {
             return ScenarioResult.CreateInconclusive(Inconclusive, this);
         }
-        var state = await ScenarioBuilder<TState>
-            .States
-            .GetOrAdd(StateKey, async (x) => await stateFactory())
-            .ConfigureAwait(false);
+
+
+        var state = await (SetOptions.Mode switch
+        {
+            StateMode.Isolated => stateFactory(State),
+            StateMode.Shared => ScenarioBuilder<TState>
+                .States
+                .GetOrAdd(StateKey, async (x) => await stateFactory(State)),
+            _ => throw new ArgumentOutOfRangeException()
+        });
 
         var engine = ScenarioBuilder<TState>.Engines[EngineId];
 
@@ -100,3 +109,4 @@ public class Scenario<TState> : Scenario where TState : IState
         await context.ExecuteAssertToken(Output);
     }
 }
+

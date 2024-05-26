@@ -1,6 +1,8 @@
-using NeverTest.StandardScenarios.Yaml;
+using NeverTest.Tests.CustomState;
 
 namespace NeverTest.Tests;
+
+using NeverTest.StandardScenarios.Yaml;
 
 [TestClass]
 public class ManualExecutionTests
@@ -17,7 +19,7 @@ public class ManualExecutionTests
         {
             var result = await engine
                 .LoadSet<State>(setName)
-                .Run(() => State.Instance);
+                .Run(_ => State.Instance);
 
             result.Assert();
         }
@@ -38,7 +40,7 @@ public class ManualExecutionTests
             .UseStandardScenarioSets()
             .Build()
             .LoadSet<State>(name)
-            .Run(() => State.Instance);
+            .Run(_ => State.Instance);
 
         result.Assert();
     }

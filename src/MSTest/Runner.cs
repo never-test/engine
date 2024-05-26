@@ -1,5 +1,6 @@
 using System.Runtime.ExceptionServices;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json.Linq;
 
 namespace NeverTest.MSTest;
 
@@ -9,7 +10,7 @@ namespace NeverTest.MSTest;
 /// </summary>
 public class Runner : Runner<State>
 {
-    protected override Task<State> CreateState() => State.Instance;
+    protected override Task<State> CreateState(JToken? state) => State.Instance;
 }
 public abstract class Runner<T> where T : IState
 {
@@ -38,6 +39,6 @@ public abstract class Runner<T> where T : IState
             ExceptionDispatchInfo.Capture(result.Exception).Throw();
         }
     }
-    protected abstract Task<T> CreateState();
+    protected abstract Task<T> CreateState(JToken? state);
 
 }

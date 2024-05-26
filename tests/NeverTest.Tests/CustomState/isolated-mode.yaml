@@ -1,0 +1,25 @@
+options:
+  mode: isolated
+state:
+  counter: 663
+
+scenarios:
+  - name: this scenario should create first instance of state
+    when:
+      $a: increment
+      $result: state
+    output:
+      $a: 664
+      $result:
+        Counter: 664
+
+  - name: this scenario should create second instance of state
+    when:
+      $a: increment
+      $b: increment
+      $result: state
+    output:
+      $a: 664
+      $b: 665
+      $result:
+        Counter: 665

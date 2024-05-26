@@ -1,0 +1,8 @@
+scenarios:
+  - name: should create default state
+    when:
+      $a: increment
+      $b: increment
+    output:
+      $a: 1
+      $b: 2

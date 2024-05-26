@@ -48,4 +48,12 @@ public class ScenarioBuilder<TState> where TState : IState
 }
 
 public record AssertKey(string Value);
-public record ActKey(string Value);
+
+// todo: readonly struct? consider using vogen?
+public record ActKey
+{
+    public string Value { get; private init; } = null!;
+    public static ActKey FromString(string value) => new() {Value = value};
+
+    public override string ToString() => Value;
+}
