@@ -3,27 +3,27 @@ using NeverTest.StandardScenarios.Yaml;
 namespace NeverTest.Tests;
 
 [TestClass]
-public class Scenarios : Runner
+public class ActScenarios : Runner
 {
-    [StandardSet(Sets.Basics)]
+    [StandardSet(Sets.Acts.Basics)]
     public Task Basics(Scenario<State> s) => Run(s);
 
-    [StandardSet(Sets.Echo)]
+    [StandardSet(Sets.Acts.Echo)]
     public Task Echo(Scenario<State> s) => Run(s);
 
-    [StandardSet(Sets.Folding)]
+    [StandardSet(Sets.Acts.Folding)]
     public Task Folding(Scenario<State> s) => Run(s);
 
-    [StandardSet(Sets.Nesting)]
+    [StandardSet(Sets.Acts.Nesting)]
     public Task Naming(Scenario<State> s) => Run(s);
 
-    [StandardSet(Sets.Naming)]
+    [StandardSet(Sets.Acts.Naming)]
     public Task Nesting(Scenario<State> s) => Run(s);
 
-    [StandardSet(Sets.Referencing)]
+    [StandardSet(Sets.Acts.Referencing)]
     public Task Referencing(Scenario<State> s) => Run(s);
 
-    [StandardSet(Sets.Advanced)]
+    [StandardSet(Sets.Acts.Advanced)]
     public Task Advanced(Scenario<State> s) => Run(s);
 
 }

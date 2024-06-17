@@ -1,6 +1,6 @@
 namespace NeverTest.Acts;
 
-public class Repeat : IActStep<JObject, IState>
+internal sealed class Repeat : IActStep<JObject, IState>
 {
     public async Task<object?> Act(JObject input, IScenarioContext<IState> context)
     {
@@ -13,7 +13,7 @@ public class Repeat : IActStep<JObject, IState>
         if (act is null) return null;
 
         var result = new JArray();
-        for (int i = 0; i < times; i++)
+        for (var i = 0; i < times; i++)
         {
             var frame = await context.ExecuteActToken(act, i.ToString());
             result.Add(frame.BuildOutput(context) ?? JValue.CreateNull());

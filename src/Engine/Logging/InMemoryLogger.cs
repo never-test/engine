@@ -1,4 +1,4 @@
-namespace NeverTest;
+namespace NeverTest.Logging;
 
 internal class InMemoryLogger(LogLevel minimumLogLevel) : ILogger
 {
@@ -19,7 +19,6 @@ internal class InMemoryLogger(LogLevel minimumLogLevel) : ILogger
     }
 
     public bool IsEnabled(LogLevel logLevel) => true;
-
 
     public IDisposable BeginScope<TState>(TState state) where TState : notnull
     {

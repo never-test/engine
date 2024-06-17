@@ -1,4 +1,6 @@
-using NeverTest.Building;
+using NeverTest.Acts;
+using NeverTest.Asserts;
+using Newtonsoft.Json;
 
 namespace NeverTest;
 
@@ -13,16 +15,20 @@ public class ScenarioBuilder<TState> where TState : IState
     // ReSharper disable once StaticMemberInGenericType
     public static readonly ConcurrentDictionary<string, ScenarioEngine> Engines = new();
     private readonly IServiceCollection _serviceCollection = new ServiceCollection();
-    private readonly ActBuilder<TState> _acts;
 
-    public ActBuilder<TState> Acts => _acts;
+    public ActBuilder<TState> Acts { get; }
+    public AssertBuilder<TState> Asserts { get; }
+
     public ScenarioBuilder()
     {
         _serviceCollection
             .AddLogging(b => b
                 .SetMinimumLevel(LogLevel.Information));
 
-        _acts = new ActBuilder<TState>(this);
+        _serviceCollection.AddOptions<JsonSerializerSettings>();
+
+        Acts = new ActBuilder<TState>(this);
+        Asserts = new AssertBuilder<TState>(this);
     }
 
     public IServiceCollection Services => _serviceCollection;
@@ -34,7 +40,8 @@ public class ScenarioBuilder<TState> where TState : IState
         {
             EngineId = engineId,
             Provider = _serviceCollection.BuildServiceProvider(),
-            Acts = Acts.Instances
+            Acts = Acts.Instances,
+            Asserts = Asserts.Instances
         });
     }
 
@@ -47,13 +54,4 @@ public class ScenarioBuilder<TState> where TState : IState
     }
 }
 
-public record AssertKey(string Value);
-
 // todo: readonly struct? consider using vogen?
-public record ActKey
-{
-    public string Value { get; private init; } = null!;
-    public static ActKey FromString(string value) => new() {Value = value};
-
-    public override string ToString() => Value;
-}

@@ -26,13 +26,13 @@ public class ManualExecutionTests
     }
 
     [DataTestMethod]
-    [DataRow(Sets.Basics)]
-    [DataRow(Sets.Echo)]
-    [DataRow(Sets.Referencing)]
-    [DataRow(Sets.Naming)]
-    [DataRow(Sets.Advanced)]
-    [DataRow(Sets.Nesting)]
-    [DataRow(Sets.Folding)]
+    [DataRow(Sets.Acts.Basics)]
+    [DataRow(Sets.Acts.Echo)]
+    [DataRow(Sets.Acts.Referencing)]
+    [DataRow(Sets.Acts.Naming)]
+    [DataRow(Sets.Acts.Advanced)]
+    [DataRow(Sets.Acts.Nesting)]
+    [DataRow(Sets.Acts.Folding)]
     public async Task Should_run_predefined_set(string name)
     {
         var result = await new ScenarioBuilder<State>()

@@ -1,15 +1,13 @@
+namespace NeverTest.Acts;
+
 using System.Reflection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using NeverTest.Acts;
-
-namespace NeverTest.Building;
-
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 public class ActBuilder<TState>(ScenarioBuilder<TState> builder) where TState : IState
 {
-    private readonly Dictionary<ActKey, StepInstance> _acts = new();
-    internal IReadOnlyDictionary<ActKey, StepInstance> Instances => _acts;
+    private readonly Dictionary<ActKey, ActInstance> _acts = new();
+    internal IReadOnlyDictionary<ActKey, ActInstance> Instances => _acts;
     public ScenarioBuilder<TState> Builder => builder;
     public ActBuilder<TState> Register<TAct>(Action<ActOptions>? configure = null) where TAct : class, IActStep<JToken, TState> => Register<TAct, JToken>(configure);
     public ActBuilder<TState> Register<TAct, TInput>(Action<ActOptions>? configure = null) where TAct : class, IActStep<TInput, TState> where TInput : class
@@ -18,7 +16,7 @@ public class ActBuilder<TState>(ScenarioBuilder<TState> builder) where TState : 
         var key = options.GetKey();
 
         builder.Services.TryAddTransient<TAct>();
-        builder.Services.TryAddTransient<StepRegistration<TAct, TInput>>(sp =>new()
+        builder.Services.TryAddTransient<ActRegistration<TAct, TInput>>(sp =>new()
         {
             Key = key,
             Act = sp.GetRequiredService<TAct>
@@ -40,16 +38,16 @@ public class ActBuilder<TState>(ScenarioBuilder<TState> builder) where TState : 
         Func<TInput, IScenarioContext<TState>, object?> callback,
         Action<ActOptions> configure) where TInput : class?
     {
-        var options = CreateOptions<Callback<TInput, TState>, TInput>(configure);
+        var options = CreateOptions<CallbackAct<TInput, TState>, TInput>(configure);
         var key = options.GetKey();
 
-        builder.Services.AddTransient<StepRegistration<Callback<TInput, TState>, TInput>>(sp =>new()
+        builder.Services.AddTransient<ActRegistration<CallbackAct<TInput, TState>, TInput>>(sp =>new()
         {
             Key = key,
-            Act = ()=> new Callback<TInput, TState>(callback)
+            Act = ()=> new CallbackAct<TInput, TState>(callback)
         });
 
-        RegisterStep<Callback<TInput, TState>, TInput>(options);
+        RegisterStep<CallbackAct<TInput, TState>, TInput>(options);
 
         return this;
     }
@@ -69,7 +67,7 @@ public class ActBuilder<TState>(ScenarioBuilder<TState> builder) where TState : 
         return options;
     }
 
-    private class StepRegistration<TAct, TInput>
+    private class ActRegistration<TAct, TInput>
         where TAct : IActStep<TInput, TState>
     {
         public required ActKey Key { get; init; }
@@ -90,16 +88,16 @@ public class ActBuilder<TState>(ScenarioBuilder<TState> builder) where TState : 
             throw new ArgumentException($"Act with the '{key.Value}' name has been already registered.");
         }
 
-        var step = new StepInstance
+        var step = new ActInstance
         {
             Invocation = async (input, sc) =>
             {
                 var registration = sc
                     .Engine
                     .Provider
-                    .GetServices<StepRegistration<TAct, TInput>>()
+                    .GetServices<ActRegistration<TAct, TInput>>()
                     .FirstOrDefault(x => x.Key == key)
-                    ?? throw new ArithmeticException($"Registration for '{key}' was not found.");
+                    ?? throw new ArgumentException($"Registration for '{key}' was not found.");
 
                 return await registration
                     .Act()

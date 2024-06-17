@@ -1,4 +1,4 @@
-namespace NeverTest;
+namespace NeverTest.Acts;
 
 public class ActOptions
 {
@@ -9,10 +9,4 @@ public class ActOptions
         ArgumentException.ThrowIfNullOrWhiteSpace(Name);
         return ActKey.FromString(Name);
     }
-}
-
-public class ActAttribute(string name) : Attribute
-{
-    private string Name { get; } = name;
-    public ActOptions ToOptions() => new() {Name = Name};
 }

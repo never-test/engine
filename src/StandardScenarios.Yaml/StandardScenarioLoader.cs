@@ -1,11 +1,14 @@
-﻿namespace NeverTest.StandardScenarios.Yaml;
+﻿using Newtonsoft.Json;
 
-using NeverTest.Yaml;
+namespace NeverTest.StandardScenarios.Yaml;
+
+using Microsoft.Extensions.Options;
 using YamlConverter;
 using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
-public class StandardScenarioLoader : IScenarioSetLoader
+using NeverTest.Yaml;
+
+public class StandardScenarioLoader(IOptions<YamlOptions> options) : IScenarioSetLoader
 {
     public ScenarioSetBase<T> Load<T>(string set) where T : IState
     {
@@ -17,7 +20,9 @@ public class StandardScenarioLoader : IScenarioSetLoader
 
         var builder = new DeserializerBuilder()
             .WithTypeConverter(new JTokenYamlConverter())
-            .WithNamingConvention(UnderscoredNamingConvention.Instance);
+            .WithNamingConvention(options.Value.NamingConvention);
+
+        options.Value.Customize?.Invoke(builder);
 
         var deserializer = builder.Build();
         using var reader = new StreamReader(scenarioStream);

@@ -1,8 +1,10 @@
+namespace NeverTest;
+
 using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace NeverTest;
+using Logging;
 
 public record ScenarioOptions
 {
@@ -34,13 +36,13 @@ public abstract class Scenario
     public string StateKey { get; internal set; }
     public string EngineId { get; internal set; }
     public SetOptions SetOptions { get; internal set; }
-
     internal JToken State { get; set; }
 #nullable enable
 
     public required JToken When { get; init; }
     public JToken? Then { get; init; }
     public JToken? Output { get; init; }
+    public JToken? Exception { get; init; }
 }
 
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -53,7 +55,6 @@ public class Scenario<TState> : Scenario where TState : IState
         {
             return ScenarioResult.CreateInconclusive(Inconclusive, this);
         }
-
 
         var state = await (SetOptions.Mode switch
         {
@@ -99,14 +100,61 @@ public class Scenario<TState> : Scenario where TState : IState
     }
     protected virtual async Task Run(ScenarioContext<TState> context)
     {
+
+        TimeSpan actDuration;
+        TimeSpan asserDuration;
+        TimeSpan outputDuration;
+
         _ = new JObject
         {
             {nameof(When).ToLower(), When},
             {nameof(Then).ToLower(), Then},
+            {nameof(Exception).ToLower(), Exception},
         };
 
-        await context.ExecuteActToken(When, "when");
-        await context.ExecuteAssertToken(Output);
+        try
+        {
+            var start = Stopwatch.GetTimestamp();
+
+            await context.ProcessActs(When);
+
+            actDuration = Stopwatch.GetElapsedTime(start);
+            context.Info("Act stage completed in {Duration}", actDuration);
+
+            if (Output is not null)
+            {
+                start = Stopwatch.GetTimestamp();
+
+                await context.ProcessOutputExpectations(Output);
+
+                outputDuration = Stopwatch.GetElapsedTime(start);
+                context.Info("Output verification stage completed in {Duration}", outputDuration);
+            }
+
+            if (Then is not  null && Output is null)
+            {
+                start = Stopwatch.GetTimestamp();
+
+                await context.ProcessAsserts(Then!);
+
+                asserDuration = Stopwatch.GetElapsedTime(start);
+                context.Info("Asset stage completed in {Duration}", asserDuration);
+            } else if (Output is null)
+            {
+                throw new InvalidOperationException("There should be at least one assertion.");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            if (Exception is not null)
+            {
+                await context.ProcessExceptionExpectation(Exception, ex);
+            }
+            else
+            {
+                throw;
+            }
+        }
     }
 }
-

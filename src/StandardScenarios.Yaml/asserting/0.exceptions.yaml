@@ -1,0 +1,17 @@
+scenarios:
+  - name: should allow asserting exception
+    describe: |
+      demonstrates how to assert exceptions thrown by engine.
+      these usually are assertion exceptions. It is primarily
+      intended for testing the engine.
+    when: ping
+    output: pongx
+    exception:
+      matches:
+        Message: |-
+          JSON document has a different value at $.
+          Actual document
+          "pong"
+          was expected to be equivalent to
+          "pongx"
+          .

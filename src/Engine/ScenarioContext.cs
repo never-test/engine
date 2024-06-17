@@ -1,7 +1,13 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+
 namespace NeverTest;
 
 using FluentAssertions.Json;
 using Newtonsoft.Json;
+
+using Asserts;
+using Logging;
 
 /// <summary>
 /// Contains context for a single scenario in a set.
@@ -11,15 +17,29 @@ using Newtonsoft.Json;
 
 public record ScenarioContext<T> : IScenarioContext<T> where T : IState
 {
-    private int _level = 0;
-    public T State() => StateInstance;
-    public required ILogger Log { get; init; }
 
     private ScenarioFrame _root = null!;
+    private int _level = 0;
+    private readonly Lazy<JsonSerializerSettings> _settingFactory;
+
+    public T State() => StateInstance;
+    public required ILogger Log { get; init; }
+    public required IServiceProvider Provider { get; init; }
+    public required ScenarioEngine Engine { get; init; }
+    public required Scenario Scenario { get; init; }
+    public required T StateInstance { get; init; }
+
     public string Indent => new(' ', Math.Max(Level - 1, 0) * 2);
     public int Level => _level;
-    public async Task<ScenarioFrame> ExecuteActToken(JToken input,
-        string output)
+
+    public JsonSerializerSettings JsonSerializerSettings => _settingFactory.Value;
+
+    public ScenarioContext()
+    {
+        _settingFactory = new Lazy<JsonSerializerSettings>(() => Engine!.Provider.GetRequiredService<IOptions<JsonSerializerSettings>>().Value);
+    }
+
+    public async Task<ScenarioFrame> ExecuteActToken(JToken input, string output)
     {
         _level++;
         var prev = _currentFrame;
@@ -31,8 +51,9 @@ public record ScenarioContext<T> : IScenarioContext<T> where T : IState
                 FrameType = FrameType.Output,
                 Input = input,
                 OutputName = output,
-                Path = input.Path
+                Path = input.Path,
             };
+            _currentFrame.SetResult(new() {Status = ExecutionStatus.Executed, Value = null, Exception = null});
             // store root frame for refs is needed
             _root = _currentFrame;
 
@@ -79,28 +100,56 @@ public record ScenarioContext<T> : IScenarioContext<T> where T : IState
         return rr!;
     }
 
-    public required IServiceProvider Provider { get; init; }
+    internal Task ProcessActs(JToken token) =>  ExecuteActToken(token, "when");
 
-    public required ScenarioEngine Engine { get; init; }
-    public required Scenario Scenario { get; init; }
-    public required T StateInstance { get; init; }
-
-    public async Task ExecuteAssertToken(JToken? token)
+    internal async ValueTask ProcessAsserts(JToken token)
     {
-        this.Info("-------------------------");
+        var output = _root.BuildOutput(this);
 
+        if (Scenario.Options.Refs ?? Scenario.SetOptions.Refs)
+        {
+            var replacer = new RefReplacer();
+            token = replacer.Replace(token, new Lazy<JToken>(() => output), this)!;
+        }
+
+        if (token is JObject jo)
+        {
+            foreach (var prop in jo.Properties())
+            {
+                if (prop.Name.StartsWith(MagicStrings.VariableMarker))
+                {
+                    await ExecuteAssertToken(prop.Value, GetVarOutput(prop.Name));
+                }
+            }
+        }
+
+        return;
+
+        JToken GetVarOutput(string var)
+        {
+            if (output is JObject jObject && jObject.TryGetValue(var, out var varOutput))
+            {
+                return varOutput;
+            }
+
+            // not supporting vars in array or nested. is there use?
+
+            throw new InvalidOperationException($"Could not find variable '{var}' in the output.");
+        }
+    }
+
+    internal async Task ProcessOutputExpectations(JToken token)
+    {
         var root = _currentFrame ?? throw new InvalidOperationException("Root frame is null");
         var output = root.BuildOutput(this);
 
-        Log.LogInformation("{Output}", output.ToString());
-
         output.Should().BeEquivalentTo(token);
+
         await Task.CompletedTask;
     }
 
     private ScenarioFrame? _currentFrame;
 
-    public ScenarioFrame Frame => _currentFrame ?? throw new InvalidOperationException("Current scenario frame is not set.");
     private async Task ExecuteAct(ScenarioFrame frame)
     {
         ExecutionStatus status;
@@ -141,7 +190,7 @@ public record ScenarioContext<T> : IScenarioContext<T> where T : IState
             Value = result
         };
 
-        frame.SetResult(actResult, this);
+        frame.SetResult(actResult);
     }
 
     private JToken? ProcessRefs(JToken? input)
@@ -151,90 +200,56 @@ public record ScenarioContext<T> : IScenarioContext<T> where T : IState
 
         // todo: put this somewhere? Provider?
         var replacer = new RefReplacer();
-        var output = _root.BuildOutput(this);
+        var output = new Lazy<JToken>(()=>_root.BuildOutput(this));
         return replacer.Replace(input, output, this);
     }
-}
 
 
-public record ActResult
-{
-    public static readonly ActResult Pending = new()
+    public async ValueTask ExecuteAssertToken(JToken token, JToken? actual)
     {
-        Value = null,
-        Exception = null,
-        Status = ExecutionStatus.Pending
-    };
-
-    public required ExecutionStatus Status { get; init; }
-    public required object? Value { get; init; }
-    public required Exception? Exception { get; set; }
-}
-
-public enum ExecutionStatus
-{
-    Executed = 1,
-    Faulted = 2,
-    EngineError = 3,
-    Ignored = 4,
-    Pending = 5
-}
-
-public enum FrameType
-{
-    Output = 1,
-    Execution = 2
-}
-
-/// <summary>
-/// Non-generic version of scenario context to be used in non-generic-context steps
-/// </summary>
-public record ScenarioContext : ScenarioContext<IState>
-{
-    public ScenarioContext(JToken when) : base()
-    {
-    }
-}
-
-public enum Form
-{
-    Unknown = 1,
-    Value,
-    Object,
-    Array
-}
-
-
-public static class ScenarioContextLoggingExtensions
-{
-    public static void Info(this IScenarioContext context, string message, params object?[] args) => context.Write(LogLevel.Information, message, args);
-    public static void Trace(this IScenarioContext context, string message, params object?[] args) => context.Write(LogLevel.Trace, message, args);
-    public static void Debug(this IScenarioContext context, string message, params object?[] args) => context.Write(LogLevel.Debug, message, args);
-    public static void Warn(this IScenarioContext context, string message, params object?[] args) => context.Write(LogLevel.Warning, message, args);
-    private static void Write(this IScenarioContext context,
-        LogLevel level,
-        string message,
-        params object?[] args)
-    {
-        if (!context.Log.IsEnabled(level)) return;
-
-        var array = new object[args.Length + 1];
-        array[0] = context.Indent;
-        Array.Copy(args, 0, array, 1, args.Length);
-        var symbol = level switch
+        switch (token)
         {
-            LogLevel.Trace => '#',
-            LogLevel.Debug => '*',
-            LogLevel.Warning => '?',
-            LogLevel.Error => '!',
-            LogLevel.Critical => '@',
-            _ => ' '
-        };
-        var msg = $"{symbol}{{Indent}} {message}";
+            case JValue jv:
+                {
+                    var assert = Get(jv.Value<string>()!, jv.Path);
+                    await assert.Invocation(actual, null, this);
+                    break;
+                }
+            case JObject jo:
+                {
+                    foreach (var prop in jo.Properties())
+                    {
+                        var assert = Get(prop.Name, prop.Path);
+                        await assert.Invocation(actual, prop.Value, this);
+                    }
+                    break;
+                }
+            case JArray ja:
+                {
+                    foreach (var val in ja)
+                    {
+                        await ExecuteAssertToken(val, actual);
+                    }
+                    break;
+                }
 
-#pragma warning disable CA2254
-        // ReSharper disable once TemplateIsNotCompileTimeConstantProblem
-        context.Log.Log(level, msg, array);
-#pragma warning restore CA2254
+            default: throw new InvalidOperationException($"Token {token.Type} at {token.Path}  is not supported.");
+        }
+
+        AssertInstance Get(string name, string path)
+        {
+            var key = AssertKey.FromString(name);
+            if(!Engine.Asserts.TryGetValue(key, out var instance))
+            {
+                throw new InvalidOperationException($"Assert {name} was not found at {path}.");
+            }
+
+            return instance;
+        }
+    }
+    public ValueTask ProcessExceptionExpectation(JToken expected, Exception actual)
+    {
+        this.Info("exception");
+        return ExecuteAssertToken(expected, actual.ToJson(JsonSerializerSettings));
     }
 }

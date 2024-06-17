@@ -1,20 +1,18 @@
-using System.Text.RegularExpressions;
-using FluentAssertions.Equivalency;
-
 namespace NeverTest;
+
+using System.Text.RegularExpressions;
+using Logging;
 
 internal sealed class RefReplacer
 {
-    private const string Marker = "_{";
-
-    public JToken? Replace(JToken actInput, JToken output, IScenarioContext context)
+    public JToken? Replace(JToken input, Lazy<JToken> output, IScenarioContext context)
     {
-        if (actInput is JValue v)
+        if (input is JValue v)
         {
             return DoReplace(v, output, context);
         }
 
-        if (actInput is JArray ja)
+        if (input is JArray ja)
         {
             var array = new JArray();
             foreach (var token in ja.Children())
@@ -25,7 +23,7 @@ internal sealed class RefReplacer
             return array;
         }
 
-        if (actInput is JObject jo)
+        if (input is JObject jo)
         {
             var obj = new JObject();
 
@@ -38,13 +36,13 @@ internal sealed class RefReplacer
             return obj;
         }
 
-        return actInput;
+        return input;
     }
 
-    private static readonly Regex s_matchAnyRef = new(Marker + @"\$(?'path'[^\}]+)\}");
-    private static readonly Regex s_matchSingleRef = new("^"+ Marker + @"\$(?'path'[^\}]+)\}$");
+    private static readonly Regex s_matchAnyRef = new(MagicStrings.ReplacementMarker + @"\$(?'path'[^\}]+)\}");
+    private static readonly Regex s_matchSingleRef = new("^"+ MagicStrings.ReplacementMarker + @"\$(?'path'[^\}]+)\}$");
 
-    private JToken? DoReplace(JValue node, JToken output, IScenarioContext context)
+    private JToken? DoReplace(JValue node, Lazy<JToken> output, IScenarioContext context)
     {
         context.Trace("ref: {path}", node.Path);
         if (node.Value is not string input)
@@ -56,7 +54,7 @@ internal sealed class RefReplacer
         if (singleTokenMatch.Success)
         {
             var targetPath = $"${singleTokenMatch.Groups["path"].Value}";
-            return output.SelectToken(targetPath)?.DeepClone();;
+            return output.Value.SelectToken(targetPath)?.DeepClone();;
         }
 
         var replaced = s_matchAnyRef.Replace(
@@ -64,7 +62,7 @@ internal sealed class RefReplacer
             match =>
             {
                 var targetPath = $"${match.Groups["path"].Value}";
-                return output
+                return output.Value
                            .SelectToken(targetPath)?
                            .Value<string>() ??
                        throw new InvalidOperationException($"'{node.Path}' contains step expression '{targetPath}' that could not be resolved ");

@@ -1,12 +1,14 @@
 using System.Diagnostics;
+using NeverTest.Acts;
 
 namespace NeverTest;
 
 [DebuggerDisplay(DebugString)]
-public sealed record ScenarioFrame
+public sealed class ScenarioFrame
 {
     private const string DebugString = "{FrameType} ({Form}) {Path}";
     private const string ValueFrameKey = "__value";
+    private const char VariableSymbol = '$';
     public required ScenarioFrame? Parent { get; init; }
     public ActResult Result { get; private set; } = ActResult.Pending;
     public required FrameType FrameType { get; init; }
@@ -30,7 +32,7 @@ public sealed record ScenarioFrame
     }
     public required string OutputName { get; init; }
     public required string Path { get; init; }
-    internal StepInstance Step { get; private init; } = StepInstance.NotApplicable;
+    internal ActInstance Step { get; private init; } = ActInstance.NotApplicable;
 
     private readonly Dictionary<string, ScenarioFrame> _frames = new();
     private readonly JToken? _input;
@@ -61,7 +63,7 @@ public sealed record ScenarioFrame
         {
             foreach (var property in objectForm.Properties())
             {
-                if (property.Name.StartsWith('$'))
+                if (property.Name.StartsWith(VariableSymbol))
                 {
                     var frame = CreateOutputFrame(
                         property.Name,
@@ -100,7 +102,7 @@ public sealed record ScenarioFrame
                     Input = item,
                     OutputName = index.ToString(),
                     Path = item.Path,
-                    Step = StepInstance.NotApplicable
+                    Step = ActInstance.NotApplicable
                 };
                 index++;
                 _frames.Add(frame.OutputName, frame);
@@ -110,7 +112,7 @@ public sealed record ScenarioFrame
 
         yield break;
 
-        StepInstance GetStep(ActKey key, string path)
+        ActInstance GetStep(ActKey key, string path)
         {
             if (!context.Engine.Acts.TryGetValue(key, out var step))
             {
@@ -122,10 +124,11 @@ public sealed record ScenarioFrame
         }
     }
 
-    public ScenarioFrame CreateOutputFrame(
+    internal ScenarioFrame CreateOutputFrame(
         string outputName,
         JToken input)
     {
+
         var frame = new ScenarioFrame
         {
             Parent = this,
@@ -133,19 +136,20 @@ public sealed record ScenarioFrame
             Input = input,
             OutputName = outputName,
             Path = input.Path,
-            Step = StepInstance.NotApplicable
+            Step = ActInstance.NotApplicable
         };
 
         _frames.Add(frame.OutputName, frame);
 
         return frame;
     }
-    public void SetResult(ActResult result, IScenarioContext context)
+
+    internal void SetResult(ActResult result)
     {
         if (Result != ActResult.Pending) throw new InvalidOperationException("Result already set");
         Result = result;
-
     }
+
     public JToken BuildOutput(IScenarioContext context)
     {
         if (FrameType is FrameType.Output && Form == Form.Value)
@@ -154,18 +158,19 @@ public sealed record ScenarioFrame
             {
                 return JToken.FromObject(new { Error = "Value frame is not found." });
             }
+
             var output = frame.Result.Value;
             if (output is not null)
             {
                 return JToken.FromObject(output);
             }
         }
+
         if (FrameType == FrameType.Execution)
         {
             if (Result.Status == ExecutionStatus.Executed)
             {
-                if (Result.Value is null) return JValue.CreateNull();
-                return JToken.FromObject(Result.Value);
+                return Result.Value is null ? JValue.CreateNull() : JToken.FromObject(Result.Value);
             }
 
             return JValue.CreateNull();
@@ -175,9 +180,8 @@ public sealed record ScenarioFrame
         {
             if (_frames.Count == 1 &&
                 (context.Scenario.Options.Folding
-                ?? context.Scenario.SetOptions.Folding)
-                &&
-                !_frames.Single().Key.StartsWith('$'))
+                ?? context.Scenario.SetOptions.Folding) &&
+                !_frames.Single().Key.StartsWith(VariableSymbol))
             {
                 return _frames.First().Value.BuildOutput(context);
             }

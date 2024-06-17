@@ -1,0 +1,33 @@
+scenarios:
+  - name: should allow asserting full output using value form
+    when: ping
+    then: exists
+
+  - name: should allow asserting full output object form
+    when: ping
+    then:
+      equals: pong
+
+  - name: should allow asserting output using array form
+    when:
+      echo: one
+      ping:
+    then:
+      - equals:
+          echo: one
+          ping: pong
+      - matches:
+          echo: one
+
+  - name: should allow asserting single variable
+    when:
+      $one: ping
+      $two:
+        echo:
+          foo: bar
+          bar: baz
+    then:
+      $two:
+        equals:
+          foo: bar
+          bar: baz

@@ -130,3 +130,12 @@ scenarios:
       $ref:
         foo: pong
       $ref-ref: ping pong!
+
+  - name: bug
+    when:
+      $one:
+        echo: pong
+      $two: ping
+    output:
+      $one: pong
+      $two: pong

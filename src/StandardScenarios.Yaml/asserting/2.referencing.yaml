@@ -1,0 +1,25 @@
+options:
+  refs: true
+
+scenarios:
+  - name: should allow asserting using referenced value
+    when:
+      $one:
+        echo: pong
+      $two: ping
+    then:
+      $two:
+        equals: _{$one}
+
+  - name: should allow asserting using referenced object
+    when:
+      $one:
+        echo:
+          foo: bar
+          bar: baz
+      $two:
+        echo:
+          bar: baz
+    then:
+      $one:
+        matches: _{$two}

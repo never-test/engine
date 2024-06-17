@@ -1,4 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
+using NeverTest.Acts;
+using NeverTest.Asserts;
 using NeverTest.Yaml;
 
 namespace NeverTest;
@@ -7,8 +9,8 @@ public class ScenarioEngine
 {
     public required string EngineId { get; init; }
     public required IServiceProvider Provider { get; init; }
-    internal IReadOnlyDictionary<ActKey, StepInstance> Acts { get; init; } = null!;
-
+    internal IReadOnlyDictionary<ActKey, ActInstance> Acts { get; init; } = null!;
+    internal IReadOnlyDictionary<AssertKey, AssertInstance> Asserts { get; init; } = null!;
 
     public ScenarioSet<T> LoadSet<T>(string path) where T : IState
     {
