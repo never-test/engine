@@ -23,6 +23,10 @@ public static class Sets
         public const string Referencing = "NeverTest.StandardScenarios.Yaml.asserting.2.referencing.yaml";
 
     }
+    public static class Http
+    {
+        public const string Get = "NeverTest.StandardScenarios.Yaml.http.1.get.yaml";
+    }
 
     public static IEnumerable<string> All => typeof(Sets).Assembly.GetManifestResourceNames();
 

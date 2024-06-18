@@ -1,5 +1,3 @@
-using NeverTest.StandardScenarios.Yaml;
-
 namespace NeverTest.Tests;
 
 [TestClass]

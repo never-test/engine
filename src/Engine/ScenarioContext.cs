@@ -1,11 +1,10 @@
+using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace NeverTest;
 
 using FluentAssertions.Json;
-using Newtonsoft.Json;
-
 using Asserts;
 using Logging;
 
@@ -17,7 +16,6 @@ using Logging;
 
 public record ScenarioContext<T> : IScenarioContext<T> where T : IState
 {
-
     private ScenarioFrame _root = null!;
     private int _level = 0;
     private readonly Lazy<JsonSerializerSettings> _settingFactory;
@@ -33,6 +31,45 @@ public record ScenarioContext<T> : IScenarioContext<T> where T : IState
     public int Level => _level;
 
     public JsonSerializerSettings JsonSerializerSettings => _settingFactory.Value;
+
+    private readonly ConcurrentDictionary<JToken, List<object?>> _outputMap = new();
+
+    public TOutput? GetOutput<TOutput>(JToken actual)
+    {
+        if (!_outputMap.TryGetValue(actual, out var output))
+        {
+            throw new InvalidOperationException($"Output was not found for token {actual.Path}. ");
+        }
+
+        if (output.Count != 1)
+        {
+            throw new InvalidOperationException($"There are multiple output for given token. Please use GetOutputs<T>.");
+        }
+
+        return (TOutput?)output.Single();
+    }
+
+    public IEnumerable<TOutput?> GetOutputs<TOutput>(JToken actual)
+    {
+        if (!_outputMap.TryGetValue(actual, out var output))
+        {
+            throw new InvalidOperationException($"Output was not found for token {actual.Path}. ");
+        }
+
+        foreach (var o in output)
+        {
+            yield return (TOutput?)o;
+        }
+    }
+
+    public void TrackOutput(JToken actual, object? output)
+    {
+        _outputMap.AddOrUpdate(
+            actual,
+            static (k, i)=> [i],
+            static (token, list, arg) => { list.Add(arg); return list;
+        }, output);
+    }
 
     public ScenarioContext()
     {
@@ -120,6 +157,14 @@ public record ScenarioContext<T> : IScenarioContext<T> where T : IState
                 {
                     await ExecuteAssertToken(prop.Value, GetVarOutput(prop.Name));
                 }
+            }
+        }
+
+        if (token is JArray ja)
+        {
+            foreach (var assert in ja)
+            {
+                await ExecuteAssertToken(assert, output);
             }
         }
 

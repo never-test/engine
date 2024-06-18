@@ -2,8 +2,6 @@ using NeverTest.Tests.CustomState;
 
 namespace NeverTest.Tests;
 
-using NeverTest.StandardScenarios.Yaml;
-
 [TestClass]
 public class ManualExecutionTests
 {

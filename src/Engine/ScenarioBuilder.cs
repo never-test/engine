@@ -1,6 +1,5 @@
 using NeverTest.Acts;
 using NeverTest.Asserts;
-using Newtonsoft.Json;
 
 namespace NeverTest;
 
@@ -25,7 +24,8 @@ public class ScenarioBuilder<TState> where TState : IState
             .AddLogging(b => b
                 .SetMinimumLevel(LogLevel.Information));
 
-        _serviceCollection.AddOptions<JsonSerializerSettings>();
+        _serviceCollection
+            .AddOptions<JsonSerializerSettings>();
 
         Acts = new ActBuilder<TState>(this);
         Asserts = new AssertBuilder<TState>(this);

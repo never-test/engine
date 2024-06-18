@@ -1,10 +1,11 @@
-using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
-using NeverTest.Asserts;
-
 namespace NeverTest;
 
+using FluentAssertions.Json;
+using Microsoft.Extensions.DependencyInjection;
+
+using Asserts;
 using Acts;
+using Http;
 
 public static class ScenarioBuilderExtensions
 {
@@ -30,6 +31,8 @@ public static class ScenarioBuilderExtensions
                 .Add((actual,e, _)=> actual.Should().NotBeNull(), o=>o.Name = "exists")
                 .Register<Equals>()
                 .Register<Matches>()
-            .Builder;
+            .Builder
+                .UseHttp();
     }
+
 }

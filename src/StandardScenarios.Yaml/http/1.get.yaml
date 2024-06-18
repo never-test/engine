@@ -1,0 +1,25 @@
+scenarios:
+
+  - name: allows sending get using simple form
+    when:
+      get: https://httpbin.org/get
+    then: httpOk
+
+  - name: allows sending get using extended form
+    when:
+      get:
+        url: https://httpbin.org/get?foo=bar
+        headers:
+          x-test: one
+    then:
+      - httpOk
+      - matches:
+          ReasonPhrase: OK
+      - jsonBody:
+          matches:
+            args:
+              foo: bar
+            headers:
+              X-Test: one
+
+

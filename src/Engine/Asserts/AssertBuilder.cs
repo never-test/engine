@@ -1,5 +1,4 @@
 using NeverTest.Logging;
-using Newtonsoft.Json;
 
 namespace NeverTest.Asserts;
 

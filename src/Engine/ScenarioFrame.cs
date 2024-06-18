@@ -150,6 +150,7 @@ public sealed class ScenarioFrame
         Result = result;
     }
 
+
     public JToken BuildOutput(IScenarioContext context)
     {
         if (FrameType is FrameType.Output && Form == Form.Value)
@@ -162,7 +163,9 @@ public sealed class ScenarioFrame
             var output = frame.Result.Value;
             if (output is not null)
             {
-                return JToken.FromObject(output);
+                var actual = JToken.FromObject(output);
+                context.TrackOutput(actual, output);
+                return actual;
             }
         }
 
@@ -170,7 +173,9 @@ public sealed class ScenarioFrame
         {
             if (Result.Status == ExecutionStatus.Executed)
             {
-                return Result.Value is null ? JValue.CreateNull() : JToken.FromObject(Result.Value);
+                var actual = Result.Value is null ? JValue.CreateNull() : JToken.FromObject(Result.Value);
+                context.TrackOutput(actual, Result.Value);
+                return actual;
             }
 
             return JValue.CreateNull();
@@ -190,6 +195,7 @@ public sealed class ScenarioFrame
 
             foreach (var (name, frame) in _frames)
             {
+
                 result.Add(name, frame.BuildOutput(context));
             }
 

@@ -1,7 +1,5 @@
 namespace NeverTest;
 
-using Newtonsoft.Json;
-
 public static class ExceptionExtensions
 {
     private static readonly JsonSerializerSettings s_defaultSettings = new();
