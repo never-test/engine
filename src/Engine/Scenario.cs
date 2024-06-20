@@ -138,7 +138,7 @@ public class Scenario<TState> : Scenario where TState : IState
                 await context.ProcessAsserts(Then!);
 
                 asserDuration = Stopwatch.GetElapsedTime(start);
-                context.Info("Asset stage completed in {Duration}", asserDuration);
+                context.Info("Assert stage completed in {Duration}", asserDuration);
             } else if (Output is null)
             {
                 throw new InvalidOperationException("There should be at least one assertion.");

@@ -26,9 +26,8 @@ public static class Sets
     public static class Http
     {
         public const string Get = "NeverTest.StandardScenarios.Yaml.http.1.get.yaml";
+        public const string Post = "NeverTest.StandardScenarios.Yaml.http.2.post.yaml";
     }
 
     public static IEnumerable<string> All => typeof(Sets).Assembly.GetManifestResourceNames();
-
-
 }

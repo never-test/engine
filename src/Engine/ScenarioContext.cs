@@ -157,6 +157,10 @@ public record ScenarioContext<T> : IScenarioContext<T> where T : IState
                 {
                     await ExecuteAssertToken(prop.Value, GetVarOutput(prop.Name));
                 }
+                else
+                {
+                    await ExecuteAssertToken(prop, output);
+                }
             }
         }
 
@@ -258,6 +262,12 @@ public record ScenarioContext<T> : IScenarioContext<T> where T : IState
                 {
                     var assert = Get(jv.Value<string>()!, jv.Path);
                     await assert.Invocation(actual, null, this);
+                    break;
+                }
+            case JProperty jp:
+                {
+                    var assert = Get(jp.Name, jp.Path);
+                    await assert.Invocation(actual, jp.Value, this);
                     break;
                 }
             case JObject jo:

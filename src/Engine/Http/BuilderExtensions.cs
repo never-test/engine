@@ -9,11 +9,16 @@ public static  class BuilderExtensions
         where TState : class, IState
     {
         builder.Services.AddHttpClient();
+        builder.Services.AddSingleton<JsonResponseDeserializer>();
 
         AddHttpCodeAssert("httpOk", 200);
 
         return builder
-            .Acts.Register<Get>()
+            .Acts
+                .Register<Get>()
+                .Register<GetJson>()
+                .Register<Post>()
+                .Register<PostJson>()
             .Builder;
 
         void AddHttpCodeAssert(string name, int statusCode)
@@ -21,7 +26,7 @@ public static  class BuilderExtensions
             var like = JObject.FromObject(new {StatusCode = statusCode});
             builder
                 .Asserts
-                .Register<JsonBody>()
+                .Register<BodyJson>()
                 .Add((actual, _, ctx) => actual
                     .Should()
                     .ContainSubtree(like), o => o.Name = name);

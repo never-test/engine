@@ -1,0 +1,57 @@
+
+scenarios:
+  - name: allows sending post using simple form
+    when:
+      post: https://httpbin.org/post
+    then: httpOk
+
+  - name: allows sending post using extended form
+    when:
+      post:
+        url: https://httpbin.org/post?foo=bar
+        body:
+          baz: zoo
+        headers:
+          x-test: one
+    then:
+      - httpOk
+      - matches:
+          ReasonPhrase: OK
+          RequestMessage:
+            Method:
+              Method: POST
+      - bodyJson:
+          matches:
+            args:
+              foo: bar
+            headers:
+              X-Test: one
+
+  - name: allows sending post using raw string
+    when:
+      post:
+        url: https://httpbin.org/post
+        body: |-
+          foo=bar
+    then:
+      - bodyJson:
+          matches:
+            data: foo=bar
+
+  - name: allows sending using post json as refs
+    options:
+      refs: true
+    when:
+      $response:
+        postJson:
+          url: https://httpbin.org/post
+          body: |-
+            {
+               "foo": "zoo"
+            }
+      $result:
+        echo: _{$response.json}
+    then:
+      $result:
+        matches:
+          foo: zoo

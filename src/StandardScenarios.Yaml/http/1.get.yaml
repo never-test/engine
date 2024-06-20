@@ -1,5 +1,5 @@
-scenarios:
 
+scenarios:
   - name: allows sending get using simple form
     when:
       get: https://httpbin.org/get
@@ -15,11 +15,25 @@ scenarios:
       - httpOk
       - matches:
           ReasonPhrase: OK
-      - jsonBody:
+          RequestMessage:
+            Method:
+              Method: GET
+      - bodyJson:
           matches:
             args:
               foo: bar
             headers:
               X-Test: one
 
-
+  - name: allows using json response body in refs
+    options:
+      refs: true
+    when:
+      $resp:
+        getJson: https://httpbin.org/get?foo=bar
+      $result:
+        echo: _{$resp.args}
+    then:
+      $result:
+        equals:
+          foo: bar
