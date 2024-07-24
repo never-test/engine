@@ -1,11 +1,11 @@
 
 scenarios:
-  - name: allows sending get using simple form
+  - name: should allow sending get using simple form
     when:
       get: https://httpbin.org/get
     then: httpOk
 
-  - name: allows sending get using extended form
+  - name: should allow sending get using extended form
     when:
       get:
         url: https://httpbin.org/get?foo=bar
@@ -25,7 +25,7 @@ scenarios:
             headers:
               X-Test: one
 
-  - name: allows using json response body in refs
+  - name: should allowusing json response body in refs
     options:
       refs: true
     when:

@@ -1,0 +1,26 @@
+
+scenarios:
+  - name: should allow sending delete using simple form
+    when:
+      delete: https://httpbin.org/delete
+    then: httpOk
+
+  - name: should allow sending delete using extended form
+    when:
+      delete:
+        url: https://httpbin.org/delete?foo=bar
+        headers:
+          x-test: one
+    then:
+      - httpOk
+      - matches:
+          ReasonPhrase: OK
+          RequestMessage:
+            Method:
+              Method: DELETE
+      - bodyJson:
+          matches:
+            args:
+              foo: bar
+            headers:
+              X-Test: one

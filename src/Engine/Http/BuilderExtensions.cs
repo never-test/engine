@@ -12,13 +12,34 @@ public static  class BuilderExtensions
         builder.Services.AddSingleton<JsonResponseDeserializer>();
 
         AddHttpCodeAssert("httpOk", 200);
+        AddHttpCodeAssert("httpCreated", 201);
+        AddHttpCodeAssert("httpAccepted", 202);
+        AddHttpCodeAssert("httpNoContent", 204);
+        AddHttpCodeAssert("httpBadRequest", 400);
+        AddHttpCodeAssert("httpUnauthorized", 401);
+        AddHttpCodeAssert("httpForbidden", 403);
+        AddHttpCodeAssert("httpNotFound", 404);
+        AddHttpCodeAssert("httpMethodNotAllowed", 405);
+        AddHttpCodeAssert("httpNotAcceptable", 406);
+        AddHttpCodeAssert("httpConflict", 409);
+        AddHttpCodeAssert("httpTooManyRequests", 429);
+        AddHttpCodeAssert("httpInternalServerError", 500);
 
-        return builder
+        return builder.
+            Asserts
+                .Register<BodyJson>()
+            .Builder
             .Acts
                 .Register<Get>()
                 .Register<GetJson>()
                 .Register<Post>()
                 .Register<PostJson>()
+                .Register<Delete>()
+                .Register<Put>()
+                .Register<PutJson>()
+                .Register<Patch>()
+                .Register<PatchJson>()
+
             .Builder;
 
         void AddHttpCodeAssert(string name, int statusCode)
@@ -26,7 +47,6 @@ public static  class BuilderExtensions
             var like = JObject.FromObject(new {StatusCode = statusCode});
             builder
                 .Asserts
-                .Register<BodyJson>()
                 .Add((actual, _, ctx) => actual
                     .Should()
                     .ContainSubtree(like), o => o.Name = name);

@@ -1,6 +1,6 @@
 
 scenarios:
-  - name: allows nesting value form acts
+  - name: should allownesting value form acts
     when:
       repeat:
         times: 2
@@ -9,7 +9,7 @@ scenarios:
       - pong
       - pong
 
-  - name: allows nesting object form acts with single act
+  - name: should allownesting object form acts with single act
     when:
       repeat:
         times: 2
@@ -19,7 +19,7 @@ scenarios:
       - test
       - test
 
-  - name: allows nesting object form acts with multiple acts
+  - name: should allownesting object form acts with multiple acts
     when:
       repeat:
         times: 2
@@ -32,7 +32,7 @@ scenarios:
       - echo: test
         ping: pong
 
-  - name: allows nesting array form acts
+  - name: should allownesting array form acts
     when:
       repeat:
         times: 2

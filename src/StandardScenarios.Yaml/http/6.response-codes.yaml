@@ -1,0 +1,66 @@
+
+scenarios:
+  - name: Should allow asserting httpOk
+    when:
+      get: https://httpbin.org/get/status/200
+    then: httpOk
+
+  - name: Should allow asserting httpCreated
+    when:
+      get: https://httpbin.org/get/status/201
+    then: httpCreated
+
+  - name: Should allow asserting httpAccepted
+    when:
+      get: https://httpbin.org/get/status/202
+    then: httpAccepted
+
+  - name: Should allow asserting httpNoContent
+    when:
+      get: https://httpbin.org/get/status/204
+    then: httpNoContent
+
+  - name: Should allow asserting httpBadRequest
+    when:
+      get: https://httpbin.org/get/status/400
+    then: httpBadRequest
+
+  - name: Should allow asserting httpUnauthorized
+    when:
+      get: https://httpbin.org/get/status/401
+    then: httpUnauthorized
+
+  - name: Should allow asserting httpForbidden
+    when:
+      get: https://httpbin.org/get/status/403
+    then: httpForbidden
+
+  - name: Should allow asserting httpNotFound
+    when:
+      get: https://httpbin.org/get/status/404
+    then: httpNotFound
+
+  - name: Should allow asserting httpMethodNotAllowed
+    when:
+      get: https://httpbin.org/get/status/405
+    then: httpMethodNotAllowed
+
+  - name: Should allow asserting httpNotAcceptable
+    when:
+      get: https://httpbin.org/get/status/406
+    then: httpNotAcceptable
+
+  - name: Should allow asserting httpConflict
+    when:
+      get: https://httpbin.org/get/status/409
+    then: httpConflict
+
+  - name: Should allow asserting httpTooManyRequests
+    when:
+      get: https://httpbin.org/get/status/429
+    then: httpTooManyRequests
+
+  - name: Should allow asserting httpInternalServerError
+    when:
+      get: https://httpbin.org/get/status/500
+    then: httpInternalServerError

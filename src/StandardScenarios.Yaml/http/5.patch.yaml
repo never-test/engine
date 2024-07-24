@@ -1,14 +1,14 @@
 
 scenarios:
-  - name: should allow sending post using simple form
+  - name: should allow sending patch using simple form
     when:
-      post: https://httpbin.org/post
+      patch: https://httpbin.org/patch
     then: httpOk
 
-  - name: should allow sending post using extended form
+  - name: should allow sending patch using extended form
     when:
-      post:
-        url: https://httpbin.org/post?foo=bar
+      patch:
+        url: https://httpbin.org/patch?foo=bar
         body:
           baz: zoo
         headers:
@@ -19,7 +19,7 @@ scenarios:
           ReasonPhrase: OK
           RequestMessage:
             Method:
-              Method: POST
+              Method: PATCH
       - bodyJson:
           matches:
             args:
@@ -27,10 +27,10 @@ scenarios:
             headers:
               X-Test: one
 
-  - name: should allow sending post using raw string
+  - name: should allow sending put using raw string
     when:
-      post:
-        url: https://httpbin.org/post
+      patch:
+        url: https://httpbin.org/patch
         body: |-
           foo=bar
     then:
@@ -38,13 +38,13 @@ scenarios:
           matches:
             data: foo=bar
 
-  - name: should allow sending using post json as refs
+  - name: should allow sending using put json as refs
     options:
       refs: true
     when:
       $response:
-        postJson:
-          url: https://httpbin.org/post
+        patchJson:
+          url: https://httpbin.org/patch
           body: |-
             {
                "foo": "zoo"

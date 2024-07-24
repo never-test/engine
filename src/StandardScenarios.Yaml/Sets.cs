@@ -21,13 +21,17 @@ public static class Sets
         public const string Exceptions = "NeverTest.StandardScenarios.Yaml.asserting.0.exceptions.yaml";
         public const string Basics = "NeverTest.StandardScenarios.Yaml.asserting.1.basics.yaml";
         public const string Referencing = "NeverTest.StandardScenarios.Yaml.asserting.2.referencing.yaml";
-        public const string Equals = "NeverTest.StandardScenarios.Yaml.asserting.3.equals.yaml";
+        public const string EqualsAssert = "NeverTest.StandardScenarios.Yaml.asserting.3.equals.yaml";
 
     }
     public static class Http
     {
         public const string Get = "NeverTest.StandardScenarios.Yaml.http.1.get.yaml";
         public const string Post = "NeverTest.StandardScenarios.Yaml.http.2.post.yaml";
+        public const string Delete = "NeverTest.StandardScenarios.Yaml.http.3.delete.yaml";
+        public const string Put = "NeverTest.StandardScenarios.Yaml.http.4.put.yaml";
+        public const string Patch = "NeverTest.StandardScenarios.Yaml.http.5.patch.yaml";
+        public const string ResponseCodes = "NeverTest.StandardScenarios.Yaml.http.6.response-codes.yaml";
     }
 
     public static IEnumerable<string> All => typeof(Sets).Assembly.GetManifestResourceNames();
