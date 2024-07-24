@@ -4,48 +4,31 @@ using Acts;
 using Logging;
 
 [Act("post")]
-internal class Post(IHttpClientFactory httpClientFactory) : IActStep<JToken, IState>
+internal class Post(IHttpClientFactory clientFactory): HttpBase(clientFactory)
 {
-    public virtual async Task<object?> Act(
+    public override async Task<object?> Act(
         JToken input,
         IScenarioContext<IState> context)
+    {
+        return await SendPost(input, context);
+    }
+
+    protected Task<HttpResponseMessage> SendPost(JToken input, IScenarioContext<IState> context)
     {
         var options = HttpOptions.FromToken(
             input,
             context.JsonSerializer());
 
-        var raw = options.Body?.ToString() ?? string.Empty;
+        var raw = options.Body?.ToString();
 
-        context.Trace(raw);
+        context.Dump(raw);
 
-        var content = new StringContent(raw);
+        var content = raw is not null ? new StringContent(raw) : null;
 
-        return await SendPost(
+        return Send(
+            HttpMethod.Post,
             options,
             content,
             context);
-    }
-
-    protected async Task<HttpResponseMessage> SendPost(
-        HttpOptions options,
-        HttpContent content,
-        IScenarioContext<IState> context)
-    {
-
-        context.Debug(options);
-
-
-        var client = httpClientFactory.CreateClient(options.Name);
-        var message = new HttpRequestMessage(HttpMethod.Post, options.Url);
-
-        message.Content = content;
-
-        foreach (var header  in options.GetHeaders())
-        {
-            message.Headers.Add(header.Name, header.Values);
-        }
-
-        var response = await client.SendAsync(message);
-        return response;
     }
 }

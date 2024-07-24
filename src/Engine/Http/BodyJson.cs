@@ -13,7 +13,7 @@ internal class BodyJson(JsonResponseDeserializer deserializer) : IAssertStep
     {
         var response = context.GetOutput<HttpResponseMessage>(actual!)!;
         var body = await deserializer.Deserialize(response);
-        context.Trace(body);
+        context.Dump(body);
 
         await context.ExecuteAssertToken(expected!,  body);
     }

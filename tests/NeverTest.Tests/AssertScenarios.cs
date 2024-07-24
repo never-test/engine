@@ -11,4 +11,7 @@ public class AssertScenarios : Runner
 
     [StandardSet(Sets.Asserts.Referencing)]
     public Task Referencing(Scenario<State> s) => Run(s);
+
+    [StandardSet(Sets.Asserts.Equals)]
+    public Task Equals(Scenario<State> s) => Run(s);
 }

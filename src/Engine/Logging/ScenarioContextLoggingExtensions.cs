@@ -4,7 +4,7 @@ public static class ScenarioContextLoggingExtensions
 {
     public static void Info(this IScenarioContext context, string message, params object?[] args) => context.Write(LogLevel.Information, message, args);
     public static void Trace(this IScenarioContext context, string message, params object?[] args) => context.Write(LogLevel.Trace, message, args);
-    public static void Trace(this IScenarioContext context, object? obj)
+    public static void Dump(this IScenarioContext context, object? obj)
     {
         if (!context.Log.IsEnabled(LogLevel.Trace)) return;
         context.Write(LogLevel.Trace, "\u25cf dump: {object}", JsonConvert.SerializeObject(obj, context.JsonSerializerSettings));

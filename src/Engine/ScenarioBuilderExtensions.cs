@@ -31,6 +31,7 @@ public static class ScenarioBuilderExtensions
                 .Add((actual,e, _)=> actual.Should().NotBeNull(), o=>o.Name = "exists")
                 .Register<Equals>()
                 .Register<Matches>()
+                .Register<Select>()
             .Builder
                 .UseHttp();
     }

@@ -1,0 +1,23 @@
+scenarios:
+  - name: should allow asserting equal string value
+    when: ping
+    then:
+      equals: pong
+
+  - name: when string assertion fails should output failure message
+    when: ping
+    then:
+      equals: pongx
+    exception:
+      matches:
+        Message: Expected actualString to be "pongx" with a length of 5 because 'equals' assert is defined at 'then.equals', but "pong" has a length of 4, differs near "g" (index 3).
+
+  - name: when string assertion fails should output failure message (alt)
+    focus: y
+    when: ping
+    then:
+      equals: pongx
+    exception:
+      select:
+        path: Message
+        equals: Expectedc actualString to be "pongx" with a length of 5 because 'equals' assert is defined at 'then.equals', but "pong" has a length of 4, differs near "g" (index 3).

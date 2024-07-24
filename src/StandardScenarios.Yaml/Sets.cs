@@ -21,6 +21,7 @@ public static class Sets
         public const string Exceptions = "NeverTest.StandardScenarios.Yaml.asserting.0.exceptions.yaml";
         public const string Basics = "NeverTest.StandardScenarios.Yaml.asserting.1.basics.yaml";
         public const string Referencing = "NeverTest.StandardScenarios.Yaml.asserting.2.referencing.yaml";
+        public const string Equals = "NeverTest.StandardScenarios.Yaml.asserting.3.equals.yaml";
 
     }
     public static class Http

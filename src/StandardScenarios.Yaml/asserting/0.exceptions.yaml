@@ -1,5 +1,6 @@
 scenarios:
   - name: should allow asserting exception
+    inconclusive: line-ending issues
     describe: |
       demonstrates how to assert exceptions thrown by engine.
       these usually are assertion exceptions. It is primarily
