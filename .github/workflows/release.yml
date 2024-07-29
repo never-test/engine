@@ -15,6 +15,10 @@ jobs:
       uses: actions/setup-dotnet@v1
     - name: Install Aspire
       run: dotnet workload install aspire
+    - name: Install linux-dev-certs tool
+      run: dotnet tool update -g linux-dev-certs
+    - name: Install dev certs
+      run: dotnet linux-dev-certs install
     - name: Build
       run: dotnet build -c Release
     - name: Test
