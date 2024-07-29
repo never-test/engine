@@ -9,10 +9,10 @@ internal class Select : IAssertStep
         ArgumentNullException.ThrowIfNull(actual);
         ArgumentNullException.ThrowIfNull(expected);
 
-        if (actual is not JObject selectOptions)
+        if (expected is not JObject selectOptions)
             throw new ArgumentException("Input to 'selected' is expected to be an object with at leas.");
 
-        var path = expected[PathProperty]?.Value<string>() ?? throw new ArgumentException("Assert 'select' requires 'path' property.");
+        var path = selectOptions[PathProperty]?.Value<string>() ?? throw new ArgumentException("Assert 'select' requires 'path' property.");
 
         var input = actual.SelectToken(path);
 
