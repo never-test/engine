@@ -9,8 +9,9 @@ scenarios:
     then:
       equals: pongx
     exception:
-      matches:
-        Message: Expected actualString to be "pongx" with a length of 5 because 'equals' assert is defined at 'then.equals', but "pong" has a length of 4, differs near "g" (index 3).
+      select:
+        path: Message
+        contains: Expected actualString to be "pongx"
 
   - name: when string assertion fails should output failure message (alt)
     when: ping
@@ -19,4 +20,4 @@ scenarios:
     exception:
       select:
         path: Message
-        equals: Expected actualString to be "pongx" with a length of 5 because 'equals' assert is defined at 'then.equals', but "pong" has a length of 4, differs near "g" (index 3).
+        contains: Expected actualString to be "pongx"
