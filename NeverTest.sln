@@ -16,6 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "~", "~", "{253D2820-EADF-48
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 		Directory.Build.props = Directory.Build.props
+		.github\workflows\release.yml = .github\workflows\release.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeverTests.AspireApp.AppHost", "tests\NeverTest.AspireApp\NeverTests.AspireApp\NeverTests.AspireApp.AppHost\NeverTests.AspireApp.AppHost.csproj", "{F83EF4E7-5504-48D7-83E2-644BB14102DD}"
