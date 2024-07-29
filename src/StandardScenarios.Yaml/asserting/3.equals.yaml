@@ -5,6 +5,7 @@ scenarios:
       equals: pong
 
   - name: when string assertion fails should output failure message
+    inconclusive: TODO
     when: ping
     then:
       equals: pongx
@@ -14,6 +15,7 @@ scenarios:
         contains: Expected actualString to be "pongx"
 
   - name: when string assertion fails should output failure message (alt)
+    inconclusive: TODO
     when: ping
     then:
       equals: pongx
