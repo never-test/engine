@@ -4,6 +4,6 @@ public enum Form
 {
     Unknown = 1,
     Value,
-    Object,
+    Complex,
     Array
 }

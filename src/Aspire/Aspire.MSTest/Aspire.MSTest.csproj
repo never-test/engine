@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>NeverTest.Aspire</RootNamespace>
+    <AssemblyName>NeverTest.Aspire.MSTest</AssemblyName>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.Testing" Version="8.1.0"/>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\MSTest\MSTest.csproj"/>
+    <ProjectReference Include="..\Aspire\Aspire.csproj"/>
+  </ItemGroup>
+
+
+</Project>

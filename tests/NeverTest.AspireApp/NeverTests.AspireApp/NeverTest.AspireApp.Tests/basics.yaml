@@ -1,0 +1,27 @@
+﻿state:
+  entryPoint: Projects.NeverTests_AspireApp_AppHost, NeverTests.AspireApp.AppHost
+  clients:
+    apiservice:
+    webfrontend:
+
+scenarios:
+  - name: Should allow calling api
+    when:
+      get:
+        url: /weatherforecast
+        name: apiservice
+    then:
+      - httpOk
+      - bodyJson:
+          hasCount: 5
+
+  - name: Should allow calling front end
+    when:
+      get:
+        url: /
+        name: webfrontend
+    then:
+      - httpOk
+      - bodyString:
+          contains: |-
+            <h1>Hello, world!</h1>

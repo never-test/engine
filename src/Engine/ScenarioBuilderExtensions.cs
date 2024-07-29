@@ -32,6 +32,8 @@ public static class ScenarioBuilderExtensions
                 .Register<Equals>()
                 .Register<Matches>()
                 .Register<Select>()
+                .Register<Contains>()
+                .Register<HasCount>()
             .Builder
                 .UseHttp();
     }

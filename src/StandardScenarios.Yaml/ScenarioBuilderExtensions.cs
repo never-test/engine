@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 public static class ScenarioBuilderExtensions
 {
-    public static ScenarioBuilder<State> UseStandardScenarioSets(this ScenarioBuilder<State> builder)
+    public static ScenarioBuilder<Empty> UseStandardScenarioSets(this ScenarioBuilder<Empty> builder)
     {
         builder.Services.AddOptions<YamlOptions>();
         builder.Services.AddSingleton<IScenarioSetLoader, StandardScenarioLoader>();

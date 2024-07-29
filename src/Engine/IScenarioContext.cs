@@ -1,24 +1,21 @@
 namespace NeverTest;
 
-/// <summary>
-/// Represents context of currently running scenario.
-/// </summary>
-public interface IScenarioContext
+public interface IScenarioContextBase
 {
-    /// <summary>
-    /// Returns instance of the configured engine for current scenario.
-    /// </summary>
-    ScenarioEngine Engine { get; init; }
-
     /// <summary>
     /// Gets scenario instance.
     /// </summary>
     Scenario Scenario { get; init; }
 
     /// <summary>
+    /// Returns instance of the configured engine for current scenario.
+    /// </summary>
+    ScenarioEngine Engine { get; init; }
+
+    /// <summary>
     /// Gets scenario logger.
     /// </summary>
-    public ILogger Log { get; }
+    ILogger Log { get; }
 
     /// <summary>
     /// Gets string that represents current indentation.
@@ -26,7 +23,13 @@ public interface IScenarioContext
     public string Indent { get; }
 
     public JsonSerializerSettings JsonSerializerSettings { get; }
+}
 
+/// <summary>
+/// Represents context of currently running scenario.
+/// </summary>
+public interface IScenarioContext : IScenarioContextBase
+{
     /// <summary>
     /// Returns original object instance of the act.
     /// </summary>
@@ -46,4 +49,10 @@ public interface IScenarioContext
     public IEnumerable<TOutput?> GetOutputs<TOutput>(JToken actual);
 
     internal void TrackOutput(JToken actual, object? output);
+
+    /// <summary>
+    /// Gets service provider for this instance of scenario
+    /// </summary>
+    public IServiceProvider Provider { get; }
+
 }

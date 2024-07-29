@@ -8,7 +8,7 @@ public class ManualExecutionTests
     [TestMethod]
     public async Task Should_run_all_predefined_scenarios_manually()
     {
-        var engine = new ScenarioBuilder<State>()
+        var engine = new ScenarioBuilder<Empty>()
             .UseDefaultEngine()
             .UseStandardScenarioSets()
             .Build();
@@ -16,8 +16,8 @@ public class ManualExecutionTests
         foreach (var setName in Sets.All)
         {
             var result = await engine
-                .LoadSet<State>(setName)
-                .Run(_ => State.Instance);
+                .LoadSet<Empty>(setName)
+                .Run(_ => Empty.Instance);
 
             result.Assert();
         }
@@ -33,12 +33,12 @@ public class ManualExecutionTests
     [DataRow(Sets.Acts.Folding)]
     public async Task Should_run_predefined_set(string name)
     {
-        var result = await new ScenarioBuilder<State>()
+        var result = await new ScenarioBuilder<Empty>()
             .UseDefaultEngine()
             .UseStandardScenarioSets()
             .Build()
-            .LoadSet<State>(name)
-            .Run(_ => State.Instance);
+            .LoadSet<Empty>(name)
+            .Run(_ => Empty.Instance);
 
         result.Assert();
     }

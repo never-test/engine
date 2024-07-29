@@ -1,3 +1,4 @@
+using System.Globalization;
 using NeverTest.Logging;
 
 namespace NeverTest.Asserts;
@@ -67,7 +68,7 @@ public class AssertBuilder<TState>(ScenarioBuilder<TState> builder) where TState
 
                 var registration = sc
                                        .Engine
-                                       .Provider
+                                       .DefaultProvider
                                        .GetServices<AssertRegistration<TAssert>>()
                                        .FirstOrDefault(x => x.Key == key)
                                    ?? throw new ArgumentException($"Registration for '{key}' was not found.");
@@ -95,7 +96,7 @@ public class AssertBuilder<TState>(ScenarioBuilder<TState> builder) where TState
             .GetCustomAttribute<AssertAttribute>()?
             .ToOptions() ?? new()
         {
-            Name = assertType.Name.ToLower()
+            Name = assertType.Name.ToLower(CultureInfo.InvariantCulture)
         };
 
         configure?.Invoke(options);

@@ -1,50 +1,49 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsTestProject>true</IsTestProject>
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+  </PropertyGroup>
 
-        <IsPackable>false</IsPackable>
-        <IsTestProject>true</IsTestProject>
-    </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0"/>
+    <PackageReference Include="MSTest.TestAdapter" Version="2.2.10"/>
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.10"/>
+    <PackageReference Include="coverlet.collector" Version="3.2.0"/>
+    <PackageReference Include="YamlConvert" Version="2.1.1"/>
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0"/>
-        <PackageReference Include="MSTest.TestAdapter" Version="2.2.10"/>
-        <PackageReference Include="MSTest.TestFramework" Version="2.2.10"/>
-        <PackageReference Include="coverlet.collector" Version="3.2.0"/>
-        <PackageReference Include="YamlConvert" Version="2.1.1"/>
-    </ItemGroup>
+  <ItemGroup>
+    <None Update="**\*.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Remove="bin\**"/>
+    <None Remove="obj\**"/>
+  </ItemGroup>
 
-        <ItemGroup>
-        <None Update="**\*.yaml">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Remove="bin\**" />
-        <None Remove="obj\**" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\MSTest\MSTest.csproj"/>
+    <ProjectReference Include="..\..\src\StandardScenarios.Yaml\StandardScenarios.Yaml.csproj"/>
+  </ItemGroup>
 
-        <ItemGroup>
-          <ProjectReference Include="..\..\src\MSTest\MSTest.csproj" />
-          <ProjectReference Include="..\..\src\StandardScenarios.Yaml\StandardScenarios.Yaml.csproj" />
-        </ItemGroup>
+  <ItemGroup>
+    <Content Include="**\*.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Remove="bin\**"/>
+    <Content Remove="obj\**"/>
+  </ItemGroup>
 
-        <ItemGroup>
-          <Content Include="**\*.yaml">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-          </Content>
-          <Content Remove="bin\**" />
-          <Content Remove="obj\**" />
-        </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="bin\**"/>
+    <Compile Remove="obj\**"/>
+  </ItemGroup>
 
-        <ItemGroup>
-          <Compile Remove="bin\**" />
-          <Compile Remove="obj\**" />
-        </ItemGroup>
-
-        <ItemGroup>
-          <EmbeddedResource Remove="bin\**" />
-          <EmbeddedResource Remove="obj\**" />
-        </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="bin\**"/>
+    <EmbeddedResource Remove="obj\**"/>
+  </ItemGroup>
 </Project>

@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\NeverTests.AspireApp.ServiceDefaults\NeverTests.AspireApp.ServiceDefaults.csproj"/>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+  </PropertyGroup>
+
+</Project>

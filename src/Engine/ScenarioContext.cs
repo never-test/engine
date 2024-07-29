@@ -1,9 +1,6 @@
-using System.Collections.Concurrent;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-
 namespace NeverTest;
 
+using System.Collections.Concurrent;
 using FluentAssertions.Json;
 using Asserts;
 using Logging;
@@ -17,8 +14,7 @@ using Logging;
 public record ScenarioContext<T> : IScenarioContext<T> where T : IState
 {
     private ScenarioFrame _root = null!;
-    private int _level = 0;
-    private readonly Lazy<JsonSerializerSettings> _settingFactory;
+    private int _level;
 
     public T State() => StateInstance;
     public required ILogger Log { get; init; }
@@ -28,9 +24,8 @@ public record ScenarioContext<T> : IScenarioContext<T> where T : IState
     public required T StateInstance { get; init; }
 
     public string Indent => new(' ', Math.Max(Level - 1, 0) * 2);
+    public required JsonSerializerSettings JsonSerializerSettings { get; init; }
     public int Level => _level;
-
-    public JsonSerializerSettings JsonSerializerSettings => _settingFactory.Value;
 
     private readonly ConcurrentDictionary<JToken, List<object?>> _outputMap = new();
 
@@ -70,13 +65,55 @@ public record ScenarioContext<T> : IScenarioContext<T> where T : IState
             static (token, list, arg) => { list.Add(arg); return list;
         }, output);
     }
-
-    public ScenarioContext()
+    internal async ValueTask ProcessAsserts(JToken token)
     {
-        _settingFactory = new Lazy<JsonSerializerSettings>(() => Engine!.Provider.GetRequiredService<IOptions<JsonSerializerSettings>>().Value);
+        var output = _root.BuildOutput(this);
+
+        if (Scenario.Options.Refs ?? Scenario.SetOptions.Refs)
+        {
+            var replacer = new RefReplacer();
+            token = RefReplacer.Replace(token, new Lazy<JToken>(() => output), this)!;
+        }
+
+        if (token is JObject jo)
+        {
+            foreach (var prop in jo.Properties())
+            {
+                if (prop.Name.StartsWith(MagicStrings.VariableMarker, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    await ExecuteAssertToken(prop.Value, GetVarOutput(prop.Name));
+                }
+                else
+                {
+                    await ExecuteAssertToken(prop, output);
+                }
+            }
+        }
+
+        if (token is JArray ja)
+        {
+            foreach (var assert in ja)
+            {
+                await ExecuteAssertToken(assert, output);
+            }
+        }
+
+        return;
+
+        JToken GetVarOutput(string var)
+        {
+            if (output is JObject jObject && jObject.TryGetValue(var, out var varOutput))
+            {
+                return varOutput;
+            }
+
+            // not supporting vars in array or nested. is there use?
+
+            throw new InvalidOperationException($"Could not find variable '{var}' in the output.");
+        }
     }
 
-    public async Task<ScenarioFrame> ExecuteActToken(JToken input, string output)
+    public async Task<ScenarioFrame> ExecuteActToken(JToken token, string output)
     {
         _level++;
         var prev = _currentFrame;
@@ -86,9 +123,9 @@ public record ScenarioContext<T> : IScenarioContext<T> where T : IState
             {
                 Parent = null!,
                 FrameType = FrameType.Output,
-                Input = input,
+                Input = token,
                 OutputName = output,
-                Path = input.Path,
+                Path = token.Path,
             };
             _currentFrame.SetResult(new() {Status = ExecutionStatus.Executed, Value = null, Exception = null});
             // store root frame for refs is needed
@@ -97,7 +134,7 @@ public record ScenarioContext<T> : IScenarioContext<T> where T : IState
         }
         else
         {
-            _currentFrame = _currentFrame.CreateOutputFrame(output, input);
+            _currentFrame = _currentFrame.CreateOutputFrame(output, token);
         }
 
         var queue = new Queue<ScenarioFrame>();
@@ -138,54 +175,6 @@ public record ScenarioContext<T> : IScenarioContext<T> where T : IState
     }
 
     internal Task ProcessActs(JToken token) =>  ExecuteActToken(token, "when");
-
-    internal async ValueTask ProcessAsserts(JToken token)
-    {
-        var output = _root.BuildOutput(this);
-
-        if (Scenario.Options.Refs ?? Scenario.SetOptions.Refs)
-        {
-            var replacer = new RefReplacer();
-            token = replacer.Replace(token, new Lazy<JToken>(() => output), this)!;
-        }
-
-        if (token is JObject jo)
-        {
-            foreach (var prop in jo.Properties())
-            {
-                if (prop.Name.StartsWith(MagicStrings.VariableMarker))
-                {
-                    await ExecuteAssertToken(prop.Value, GetVarOutput(prop.Name));
-                }
-                else
-                {
-                    await ExecuteAssertToken(prop, output);
-                }
-            }
-        }
-
-        if (token is JArray ja)
-        {
-            foreach (var assert in ja)
-            {
-                await ExecuteAssertToken(assert, output);
-            }
-        }
-
-        return;
-
-        JToken GetVarOutput(string var)
-        {
-            if (output is JObject jObject && jObject.TryGetValue(var, out var varOutput))
-            {
-                return varOutput;
-            }
-
-            // not supporting vars in array or nested. is there use?
-
-            throw new InvalidOperationException($"Could not find variable '{var}' in the output.");
-        }
-    }
 
     internal async Task ProcessOutputExpectations(JToken token)
     {
@@ -250,7 +239,7 @@ public record ScenarioContext<T> : IScenarioContext<T> where T : IState
         // todo: put this somewhere? Provider?
         var replacer = new RefReplacer();
         var output = new Lazy<JToken>(()=>_root.BuildOutput(this));
-        return replacer.Replace(input, output, this);
+        return RefReplacer.Replace(input, output, this);
     }
 
 

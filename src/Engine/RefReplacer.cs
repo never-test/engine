@@ -5,7 +5,7 @@ using Logging;
 
 internal sealed class RefReplacer
 {
-    public JToken? Replace(JToken input, Lazy<JToken> output, IScenarioContext context)
+    public static JToken? Replace(JToken input, Lazy<JToken> output, IScenarioContext context)
     {
         if (input is JValue v)
         {
@@ -42,7 +42,7 @@ internal sealed class RefReplacer
     private static readonly Regex s_matchAnyRef = new(MagicStrings.ReplacementMarker + @"\$(?'path'[^\}]+)\}");
     private static readonly Regex s_matchSingleRef = new("^"+ MagicStrings.ReplacementMarker + @"\$(?'path'[^\}]+)\}$");
 
-    private JToken? DoReplace(JValue node, Lazy<JToken> output, IScenarioContext context)
+    private static JToken? DoReplace(JValue node, Lazy<JToken> output, IScenarioContext context)
     {
         context.Trace("ref: {path}", node.Path);
         if (node.Value is not string input)

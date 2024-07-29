@@ -8,9 +8,9 @@ namespace NeverTest.MSTest;
 /// Scenario runner using default empty state.
 /// Should
 /// </summary>
-public class Runner : Runner<State>
+public class Runner : Runner<Empty>
 {
-    protected override Task<State> CreateState(JToken? state) => State.Instance;
+    protected override Task<Empty> CreateState(JToken? state) => Empty.Instance;
 }
 public abstract class Runner<T> where T : IState
 {
@@ -40,5 +40,4 @@ public abstract class Runner<T> where T : IState
         }
     }
     protected abstract Task<T> CreateState(JToken? state);
-
 }

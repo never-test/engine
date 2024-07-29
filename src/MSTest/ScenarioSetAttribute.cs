@@ -1,27 +1,14 @@
+﻿using Microsoft.Extensions.Logging;
+
 namespace NeverTest.MSTest;
 
-using System.Reflection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-public abstract class ScenarioSetAttribute<T>(string path) : TestMethodAttribute, ITestDataSource
-    where T : IState
+public class ScenarioSetAttribute : ScenarioSetAttribute<Empty>
 {
-    protected ScenarioBuilder<T> Builder { get; init; } = new();
-
-    public IEnumerable<object[]> GetData(MethodInfo methodInfo)
+    public ScenarioSetAttribute(string set, LogLevel defaultLevel = LogLevel.Debug) : base(set)
     {
-        var engine = Builder.Build();
-
-        var set = engine.LoadSet<T>(path);
-
-        foreach (var scenario in set.Scenarios)
-        {
-            yield return [scenario];
-        }
-    }
-
-    public string GetDisplayName(MethodInfo methodInfo, object[] data)
-    {
-        return ((Scenario<T>)data[0]).Name;
+        Builder
+            .UseYaml()
+            .UseDefaultEngine()
+            .Verbosity(defaultLevel);
     }
 }

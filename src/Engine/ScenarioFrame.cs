@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using NeverTest.Acts;
 
 namespace NeverTest;
@@ -21,7 +22,7 @@ public sealed class ScenarioFrame
         {
             Form = value switch
             {
-                JObject => Form.Object,
+                JObject => Form.Complex,
                 JArray => Form.Array,
                 JValue => Form.Value,
                 null => Form.Value,
@@ -100,12 +101,14 @@ public sealed class ScenarioFrame
                     Parent = this,
                     FrameType = FrameType.Output,
                     Input = item,
-                    OutputName = index.ToString(),
+                    OutputName = index.ToString(CultureInfo.InvariantCulture),
                     Path = item.Path,
                     Step = ActInstance.NotApplicable
                 };
+
                 index++;
                 _frames.Add(frame.OutputName, frame);
+
                 yield return frame;
             }
         }
@@ -181,7 +184,7 @@ public sealed class ScenarioFrame
             return JValue.CreateNull();
         }
 
-        if (Form == Form.Object)
+        if (Form == Form.Complex)
         {
             if (_frames.Count == 1 &&
                 (context.Scenario.Options.Folding

@@ -5,20 +5,20 @@ namespace NeverTest.Tests;
 public class HttpScenarios : Runner
 {
     [StandardSet(Sets.Http.Get)]
-    public Task Get(Scenario<State> s) => Run(s);
+    public Task Get(Scenario<Empty> s) => Run(s);
 
     [StandardSet(Sets.Http.Post)]
-    public Task Post(Scenario<State> s) => Run(s);
+    public Task Post(Scenario<Empty> s) => Run(s);
 
     [StandardSet(Sets.Http.Delete)]
-    public Task Delete(Scenario<State> s) => Run(s);
+    public Task Delete(Scenario<Empty> s) => Run(s);
 
     [StandardSet(Sets.Http.Put)]
-    public Task Put(Scenario<State> s) => Run(s);
+    public Task Put(Scenario<Empty> s) => Run(s);
 
     [StandardSet(Sets.Http.Patch)]
-    public Task Patch(Scenario<State> s) => Run(s);
+    public Task Patch(Scenario<Empty> s) => Run(s);
 
     [StandardSet(Sets.Http.ResponseCodes)]
-    public Task ResponseCodes(Scenario<State> s) => Run(s);
+    public Task ResponseCodes(Scenario<Empty> s) => Run(s);
 }

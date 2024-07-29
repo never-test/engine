@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 using Logging;
+using Arranges;
 
 public record ScenarioOptions
 {
@@ -39,6 +40,7 @@ public abstract class Scenario
     internal JToken State { get; set; }
 #nullable enable
 
+    public JObject? Given { get; init; }
     public required JToken When { get; init; }
     public JToken? Then { get; init; }
     public JToken? Output { get; init; }
@@ -62,29 +64,51 @@ public class Scenario<TState> : Scenario where TState : IState
             StateMode.Shared => ScenarioBuilder<TState>
                 .States
                 .GetOrAdd(StateKey, async (x) => await stateFactory(State)),
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new ArgumentException($"{SetOptions.Mode} is not supported.")
         });
 
         var engine = ScenarioBuilder<TState>.Engines[EngineId];
-
-        await using var provider = engine.Provider.CreateAsyncScope();
-
-        var verbosity = Verbosity ?? provider.ServiceProvider.GetRequiredService<IOptions<LoggerFilterOptions>>().Value.MinLevel;
+        var verbosity = Verbosity ?? engine.DefaultProvider.GetRequiredService<IOptions<LoggerFilterOptions>>().Value.MinLevel;
+        var jsonSettings = engine.DefaultProvider.GetRequiredService<IOptions<JsonSerializerSettings>>();
         var log = new InMemoryLogger(verbosity);
 
-        var context = new ScenarioContext<TState>()
+        var arrangeContext = new ArrangeContext<TState>
+        {
+            Scenario = this,
+            Engine = engine,
+            Log = log,
+            Services = engine.CreateServiceCollection(),
+            StateInstance = state,
+            JsonSerializerSettings = jsonSettings.Value
+        };
+        await RunArrangeStage(arrangeContext);
+
+        await using var provider = arrangeContext
+            .Services
+            .BuildServiceProvider()
+            .CreateAsyncScope();
+
+        var context = new ScenarioContext<TState>
         {
             Engine = engine,
             StateInstance = state,
             Provider = provider.ServiceProvider,
             Log = log,
-            Scenario = this
+            Scenario = this,
+            // load settings from scenario service provider
+            // so there is opportunity to change during arrange phase
+            JsonSerializerSettings = provider
+                .ServiceProvider
+                .GetRequiredService<IOptions<JsonSerializerSettings>>()
+                .Value
         };
+
         Exception? exception = null;
         try
         {
             await Run(context);
         }
+
         catch (Exception ex)
         {
             exception = ex;
@@ -98,35 +122,77 @@ public class Scenario<TState> : Scenario where TState : IState
             Duration = Stopwatch.GetElapsedTime(start)
         };
     }
+
+    protected virtual async Task RunArrangeStage(IArrangeScenarioContext<TState> context)
+    {
+        if (Given is not null)
+        {
+
+            _ = new JObject { { nameof(Given).ToLowerInvariant(), Given } };
+
+            foreach (var arrange in Given.Properties())
+            {
+                var key = ArrangeKey.FromString(arrange.Name);
+                if (context.Engine.Arranges.TryGetValue(key, out var instance))
+                {
+                    context.Info("{Path}", arrange.Path);
+                    context.Dump(arrange.Value);
+
+                    await instance.Invocation(arrange.Value, context);
+                }
+                else
+                {
+                    throw new InvalidOperationException(
+                        $"Arrange '{key.Value}' not found. Please make sure it is registered with the engine.");
+                }
+            }
+        }
+
+        var always = context
+            .Engine
+            .DefaultProvider.GetServices<IArrangeStep<TState>>();
+
+        foreach (var step in always)
+        {
+            context.Debug("Arranging {Step}", step.GetType().FullName);
+            await step.Arrange(context);
+        }
+
+    }
+
     protected virtual async Task Run(ScenarioContext<TState> context)
     {
 
+        // TODO: report execution times outside
+        TimeSpan arrangeDuration;
         TimeSpan actDuration;
         TimeSpan asserDuration;
         TimeSpan outputDuration;
 
+        // todo: yuck
         _ = new JObject
         {
-            {nameof(When).ToLower(), When},
-            {nameof(Then).ToLower(), Then},
-            {nameof(Exception).ToLower(), Exception},
+            {nameof(When).ToLowerInvariant(), When},
+            {nameof(Then).ToLowerInvariant(), Then},
+            {nameof(Exception).ToLowerInvariant(), Exception},
         };
 
         try
         {
             var start = Stopwatch.GetTimestamp();
 
-            await context.ProcessActs(When);
+            arrangeDuration = Stopwatch.GetElapsedTime(start);
+            context.Info("Arrange stage completed in {Duration}", arrangeDuration);
 
+            start = Stopwatch.GetTimestamp();
+            await context.ProcessActs(When);
             actDuration = Stopwatch.GetElapsedTime(start);
             context.Info("Act stage completed in {Duration}", actDuration);
 
             if (Output is not null)
             {
                 start = Stopwatch.GetTimestamp();
-
                 await context.ProcessOutputExpectations(Output);
-
                 outputDuration = Stopwatch.GetElapsedTime(start);
                 context.Info("Output verification stage completed in {Duration}", outputDuration);
             }
@@ -134,11 +200,10 @@ public class Scenario<TState> : Scenario where TState : IState
             if (Then is not  null && Output is null)
             {
                 start = Stopwatch.GetTimestamp();
-
                 await context.ProcessAsserts(Then!);
-
                 asserDuration = Stopwatch.GetElapsedTime(start);
                 context.Info("Assert stage completed in {Duration}", asserDuration);
+
             } else if (Output is null)
             {
                 throw new InvalidOperationException("There should be at least one assertion.");

@@ -60,7 +60,7 @@ public class ActBuilder<TState>(ScenarioBuilder<TState> builder) where TState : 
             .GetCustomAttribute<ActAttribute>()?
             .ToOptions() ?? new()
         {
-            Name = actType.Name.ToLower()
+            Name = actType.Name.ToLowerInvariant()
         };
 
         configure?.Invoke(options);
@@ -92,16 +92,15 @@ public class ActBuilder<TState>(ScenarioBuilder<TState> builder) where TState : 
         {
             Invocation = async (input, sc) =>
             {
-                var registration = sc
-                    .Engine
-                    .Provider
-                    .GetServices<ActRegistration<TAct, TInput>>()
-                    .FirstOrDefault(x => x.Key == key)
-                    ?? throw new ArgumentException($"Registration for '{key}' was not found.");
+                var registration = sc.Provider
+                                       .GetServices<ActRegistration<TAct, TInput>>()
+                                       .FirstOrDefault(x => x.Key == key)
+                                   ?? throw new ArgumentException($"Registration for '{key}' was not found.");
 
                 return await registration
                     .Act()
                     .Act(input != null ? Convert<TInput>(input) : default!, (IScenarioContext<TState>)sc);
+
             },
             StepType = typeof(TAct),
         };

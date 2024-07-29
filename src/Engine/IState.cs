@@ -6,10 +6,10 @@ public interface IState;
 /// Represents default empty scenario set state.
 /// Suitable for the majority of use cases.
 /// </summary>
-public sealed class State : IState
+public sealed class Empty : IState
 {
     /// <summary>
     /// Gets default instance.
     /// </summary>
-    public static readonly Task<State> Instance = Task.FromResult(new State());
+    public static readonly Task<Empty> Instance = Task.FromResult(new Empty());
 }

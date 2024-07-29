@@ -10,12 +10,12 @@ using NeverTest.Yaml;
 
 public class StandardScenarioLoader(IOptions<YamlOptions> options) : IScenarioSetLoader
 {
-    public ScenarioSetBase<T> Load<T>(string set) where T : IState
+    public ScenarioSetBase<T> Load<T>(string scenarioSet) where T : IState
     {
-        var scenarioStream = GetType().Assembly.GetManifestResourceStream(set);
+        var scenarioStream = GetType().Assembly.GetManifestResourceStream(scenarioSet);
         if (scenarioStream is null)
         {
-            throw new InvalidOperationException($"Unable to load scenario: {set}");
+            throw new InvalidOperationException($"Unable to load scenario: {scenarioSet}");
         }
 
         var builder = new DeserializerBuilder()
@@ -27,8 +27,8 @@ public class StandardScenarioLoader(IOptions<YamlOptions> options) : IScenarioSe
         var deserializer = builder.Build();
         using var reader = new StreamReader(scenarioStream);
 
-        var scenarioSet = deserializer.Deserialize<ScenarioSet<T>>(reader);
-        scenarioSet.Name ??= set;
-        return scenarioSet;
+        var set = deserializer.Deserialize<ScenarioSet<T>>(reader);
+        set.Name ??= scenarioSet;
+        return set;
     }
 }

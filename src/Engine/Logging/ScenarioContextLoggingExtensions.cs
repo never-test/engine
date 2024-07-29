@@ -2,23 +2,23 @@ namespace NeverTest.Logging;
 
 public static class ScenarioContextLoggingExtensions
 {
-    public static void Info(this IScenarioContext context, string message, params object?[] args) => context.Write(LogLevel.Information, message, args);
-    public static void Trace(this IScenarioContext context, string message, params object?[] args) => context.Write(LogLevel.Trace, message, args);
-    public static void Dump(this IScenarioContext context, object? obj)
+    public static void Info(this IScenarioContextBase context, string message, params object?[] args) => context.Write(LogLevel.Information, message, args);
+    public static void Trace(this IScenarioContextBase context, string message, params object?[] args) => context.Write(LogLevel.Trace, message, args);
+    public static void Dump(this IScenarioContextBase context, object? obj)
     {
         if (!context.Log.IsEnabled(LogLevel.Trace)) return;
         context.Write(LogLevel.Trace, "\u25cf dump: {object}", JsonConvert.SerializeObject(obj, context.JsonSerializerSettings));
     }
-    public static void Debug(this IScenarioContext context, string message, params object?[] args) => context.Write(LogLevel.Debug, message, args);
+    public static void Debug(this IScenarioContextBase context, string message, params object?[] args) => context.Write(LogLevel.Debug, message, args);
 
-    public static void Debug(this IScenarioContext context, object? obj)
+    public static void Debug(this IScenarioContextBase context, object? obj)
     {
         if (!context.Log.IsEnabled(LogLevel.Debug)) return;
         context.Write(LogLevel.Debug, "\u25cb dump: {object}", JsonConvert.SerializeObject(obj, context.JsonSerializerSettings));
     }
 
-    public static void Warn(this IScenarioContext context, string message, params object?[] args) => context.Write(LogLevel.Warning, message, args);
-    private static void Write(this IScenarioContext context,
+    public static void Warn(this IScenarioContextBase context, string message, params object?[] args) => context.Write(LogLevel.Warning, message, args);
+    private static void Write(this IScenarioContextBase context,
         LogLevel level,
         string message,
         params object?[] args)
@@ -40,8 +40,9 @@ public static class ScenarioContextLoggingExtensions
         var msg = $"{symbol}{{Indent}} {message}";
 
 #pragma warning disable CA2254
-        // ReSharper disable once TemplateIsNotCompileTimeConstantProblem
+#pragma warning disable CA1848
         context.Log.Log(level, msg, array);
+#pragma warning restore CA1848
 #pragma warning restore CA2254
     }
 }

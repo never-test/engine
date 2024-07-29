@@ -1,13 +1,19 @@
-using NeverTest.Acts;
-using NeverTest.Asserts;
-
 namespace NeverTest;
 
 using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
 
+using Acts;
+using Arranges;
+using Asserts;
 using Yaml;
 
+/// <summary>
+/// Allows building scenario engine by adding
+/// arrange, act, assert steps and registering
+/// dependencies in service collection.
+/// </summary>
+/// <typeparam name="TState"></typeparam>
 public class ScenarioBuilder<TState> where TState : IState
 {
     public static readonly ConcurrentDictionary<string, Task<TState>> States = new();
@@ -17,6 +23,7 @@ public class ScenarioBuilder<TState> where TState : IState
 
     public ActBuilder<TState> Acts { get; }
     public AssertBuilder<TState> Asserts { get; }
+    public ArrangeBuilder<TState> Arranges { get; }
 
     public ScenarioBuilder()
     {
@@ -29,6 +36,7 @@ public class ScenarioBuilder<TState> where TState : IState
 
         Acts = new ActBuilder<TState>(this);
         Asserts = new AssertBuilder<TState>(this);
+        Arranges = new ArrangeBuilder<TState>(this);
     }
 
     public IServiceCollection Services => _serviceCollection;
@@ -39,9 +47,11 @@ public class ScenarioBuilder<TState> where TState : IState
         return Engines.GetOrAdd(id, engineId => new ScenarioEngine
         {
             EngineId = engineId,
-            Provider = _serviceCollection.BuildServiceProvider(),
+            DefaultProvider = _serviceCollection.BuildServiceProvider(),
+            DefaultServices = _serviceCollection,
+            Arranges = Arranges.Instances,
             Acts = Acts.Instances,
-            Asserts = Asserts.Instances
+            Asserts = Asserts.Instances,
         });
     }
 
@@ -53,5 +63,3 @@ public class ScenarioBuilder<TState> where TState : IState
         return this;
     }
 }
-
-// todo: readonly struct? consider using vogen?

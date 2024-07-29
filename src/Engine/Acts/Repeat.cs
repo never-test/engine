@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace NeverTest.Acts;
 
 internal sealed class Repeat : IActStep<JObject, IState>
@@ -15,7 +17,7 @@ internal sealed class Repeat : IActStep<JObject, IState>
         var result = new JArray();
         for (var i = 0; i < times; i++)
         {
-            var frame = await context.ExecuteActToken(act, i.ToString());
+            var frame = await context.ExecuteActToken(act, i.ToString(CultureInfo.InvariantCulture));
             result.Add(frame.BuildOutput(context) ?? JValue.CreateNull());
         }
 

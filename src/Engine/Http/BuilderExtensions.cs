@@ -28,6 +28,7 @@ public static  class BuilderExtensions
         return builder.
             Asserts
                 .Register<BodyJson>()
+                .Register<BodyString>()
             .Builder
             .Acts
                 .Register<Get>()

@@ -49,7 +49,7 @@ public class SetOptions
     /// Sets options for all scenarios in a set.
     /// Can be overriden at scenario level.
     /// </summary>
-    public bool Refs { get; set; } = false;
+    public bool Refs { get; set; }
 
     /// <summary>
     /// Enables folding.

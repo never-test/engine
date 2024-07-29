@@ -1,36 +1,38 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <RootNamespace>NeverTest.MSTest</RootNamespace>
-        <AssemblyName>NeverTest.MSTest</AssemblyName>
-    </PropertyGroup>
+  <PropertyGroup>
+    <Description>Library allows executing yaml based scenarios using MSTest framework.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="MSTest.TestFramework" Version="2.2.10" />
-    </ItemGroup>
+  <PropertyGroup>
+    <RootNamespace>NeverTest.MSTest</RootNamespace>
+    <AssemblyName>NeverTest.MSTest</AssemblyName>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Engine\Engine.csproj" />
-      <ProjectReference Include="..\StandardScenarios.Yaml\StandardScenarios.Yaml.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.10"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Engine\Engine.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Engine\Engine.csproj"/>
+    <ProjectReference Include="..\StandardScenarios.Yaml\StandardScenarios.Yaml.csproj"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <Compile Remove="obj\**" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Engine\Engine.csproj"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <EmbeddedResource Remove="obj\**" />
-    </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="obj\**"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <None Remove="obj\**" />
-    </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="obj\**"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="obj\**"/>
+  </ItemGroup>
 
 </Project>

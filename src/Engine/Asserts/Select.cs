@@ -4,7 +4,7 @@ internal class Select : IAssertStep
 {
     private const string PathProperty = "path";
 
-    public ValueTask Assert(JToken? actual, JToken? expected, IScenarioContext<IState> context)
+    public async ValueTask Assert(JToken? actual, JToken? expected, IScenarioContext<IState> context)
     {
         ArgumentNullException.ThrowIfNull(actual);
         ArgumentNullException.ThrowIfNull(expected);
@@ -21,9 +21,7 @@ internal class Select : IAssertStep
             // skip path, treat rest as asserts
             if(p.Name == PathProperty) continue;
 
-            context.ExecuteAssertToken(p, input);
+            await context.ExecuteAssertToken(p, input);
         }
-        return ValueTask.CompletedTask;
-
     }
 }

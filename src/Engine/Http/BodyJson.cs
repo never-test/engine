@@ -8,7 +8,6 @@ using Asserts;
 [Assert("bodyJson")]
 internal class BodyJson(JsonResponseDeserializer deserializer) : IAssertStep
 {
-
     public async ValueTask Assert(JToken? actual, JToken? expected, IScenarioContext<IState> context)
     {
         var response = context.GetOutput<HttpResponseMessage>(actual!)!;
