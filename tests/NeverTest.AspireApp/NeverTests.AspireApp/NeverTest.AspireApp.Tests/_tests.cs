@@ -5,7 +5,7 @@ namespace NeverTests.AspireApp.Tests;
 using NeverTest;
 
 [TestClass]
-public class Tests: AspireRunner
+public class Tests: Runner
 {
     [AspireSet("basics.yaml")]
     public Task Weather(Scenario<AspireState> s) => Run(s);

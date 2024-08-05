@@ -40,6 +40,7 @@ public abstract class Scenario
     internal JToken State { get; set; }
 #nullable enable
 
+    internal JObject? SharedGiven { get; set; }
     public JObject? Given { get; init; }
     public required JToken When { get; init; }
     public JToken? Then { get; init; }
@@ -53,21 +54,16 @@ public class Scenario<TState> : Scenario where TState : IState
     public async Task<ScenarioResult> Run(Func<JToken?, Task<TState>> stateFactory)
     {
         var start = Stopwatch.GetTimestamp();
+
         if (!string.IsNullOrEmpty(Inconclusive))
         {
             return ScenarioResult.CreateInconclusive(Inconclusive, this);
         }
 
-        var state = await (SetOptions.Mode switch
-        {
-            StateMode.Isolated => stateFactory(State),
-            StateMode.Shared => ScenarioBuilder<TState>
-                .States
-                .GetOrAdd(StateKey, async (x) => await stateFactory(State)),
-            _ => throw new ArgumentException($"{SetOptions.Mode} is not supported.")
-        });
+        var (stateTask, newState) = ConstructState(stateFactory);
+        var state = await stateTask;
 
-        var engine = ScenarioBuilder<TState>.Engines[EngineId];
+        var engine = ScenarioBuilder<TState>.s_engines[EngineId].Value;
         var verbosity = Verbosity ?? engine.DefaultProvider.GetRequiredService<IOptions<LoggerFilterOptions>>().Value.MinLevel;
         var jsonSettings = engine.DefaultProvider.GetRequiredService<IOptions<JsonSerializerSettings>>();
         var log = new InMemoryLogger(verbosity);
@@ -81,6 +77,12 @@ public class Scenario<TState> : Scenario where TState : IState
             StateInstance = state,
             JsonSerializerSettings = jsonSettings.Value
         };
+
+        if (newState)
+        {
+            await RunGlobalArrangeStage(arrangeContext);
+        }
+
         await RunArrangeStage(arrangeContext);
 
         await using var provider = arrangeContext
@@ -123,29 +125,39 @@ public class Scenario<TState> : Scenario where TState : IState
         };
     }
 
-    protected virtual async Task RunArrangeStage(IArrangeScenarioContext<TState> context)
+    private (Task<TState>, bool) ConstructState(Func<JToken?, Task<TState>> stateFactory)
+    {
+        lock (stateFactory)
+        {
+            var isNew = !ScenarioBuilder<TState>.s_states.ContainsKey(StateKey);
+
+            var state = SetOptions.Mode switch
+            {
+                StateMode.Isolated => stateFactory(State),
+                StateMode.Shared => ScenarioBuilder<TState>
+                    .s_states
+                    .GetOrAdd(StateKey, (x) => new Lazy<Task<TState>>(() => stateFactory(State))).Value,
+                _ => throw new ArgumentException($"{SetOptions.Mode} is not supported.")
+            };
+            return (state, isNew);
+        }
+    }
+
+    private async Task RunGlobalArrangeStage(IArrangeScenarioContext<TState> context)
+    {
+        if (SharedGiven is not null)
+        {
+            _ = new JObject { { nameof(Given).ToLowerInvariant(), SharedGiven } };
+            await ExecuteArrangeNode(context, SharedGiven);
+        }
+    }
+
+    private async Task RunArrangeStage(IArrangeScenarioContext<TState> context)
     {
         if (Given is not null)
         {
-
             _ = new JObject { { nameof(Given).ToLowerInvariant(), Given } };
-
-            foreach (var arrange in Given.Properties())
-            {
-                var key = ArrangeKey.FromString(arrange.Name);
-                if (context.Engine.Arranges.TryGetValue(key, out var instance))
-                {
-                    context.Info("{Path}", arrange.Path);
-                    context.Dump(arrange.Value);
-
-                    await instance.Invocation(arrange.Value, context);
-                }
-                else
-                {
-                    throw new InvalidOperationException(
-                        $"Arrange '{key.Value}' not found. Please make sure it is registered with the engine.");
-                }
-            }
+            await ExecuteArrangeNode(context, Given);
         }
 
         var always = context
@@ -157,14 +169,32 @@ public class Scenario<TState> : Scenario where TState : IState
             context.Debug("Arranging {Step}", step.GetType().FullName);
             await step.Arrange(context);
         }
+    }
 
+    private static async Task ExecuteArrangeNode(IArrangeScenarioContext<TState> context, JObject gg)
+    {
+        foreach (var arrange in gg.Properties())
+        {
+            var key = ArrangeKey.FromString(arrange.Name);
+            if (context.Engine.Arranges.TryGetValue(key, out var instance))
+            {
+                context.Info("{Path}", arrange.Path);
+                context.Dump(arrange.Value);
+
+                await instance.Invocation(arrange.Value, context);
+            }
+            else
+            {
+                var message = $"Arrange '{key.Value}' not found. Please make sure it is registered with the engine.";
+                throw new InvalidOperationException(message);
+            }
+        }
     }
 
     protected virtual async Task Run(ScenarioContext<TState> context)
     {
 
         // TODO: report execution times outside
-        TimeSpan arrangeDuration;
         TimeSpan actDuration;
         TimeSpan asserDuration;
         TimeSpan outputDuration;
@@ -181,11 +211,8 @@ public class Scenario<TState> : Scenario where TState : IState
         {
             var start = Stopwatch.GetTimestamp();
 
-            arrangeDuration = Stopwatch.GetElapsedTime(start);
-            context.Info("Arrange stage completed in {Duration}", arrangeDuration);
-
-            start = Stopwatch.GetTimestamp();
             await context.ProcessActs(When);
+
             actDuration = Stopwatch.GetElapsedTime(start);
             context.Info("Act stage completed in {Duration}", actDuration);
 
@@ -197,7 +224,7 @@ public class Scenario<TState> : Scenario where TState : IState
                 context.Info("Output verification stage completed in {Duration}", outputDuration);
             }
 
-            if (Then is not  null && Output is null)
+            if (Then is not null && Output is null)
             {
                 start = Stopwatch.GetTimestamp();
                 await context.ProcessAsserts(Then!);

@@ -8,4 +8,8 @@
     <EnableNETAnalyzers>false</EnableNETAnalyzers>
   </PropertyGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="NeverTest.AspNet.Tests" />
+  </ItemGroup>
+
 </Project>

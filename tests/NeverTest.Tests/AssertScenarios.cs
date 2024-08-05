@@ -1,7 +1,7 @@
 namespace NeverTest.Tests;
 
 [TestClass]
-public class AssertScenarios : Runner
+public class AssertScenarios : DefaultRunner
 {
     [StandardSet(Sets.Asserts.Exceptions)]
     public Task Exceptions(Scenario<Empty> s) => Run(s);

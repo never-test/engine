@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>NeverTest.AspNet</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\MSTest\MSTest.csproj"/>
+    <ProjectReference Include="..\AspNet\AspNet.csproj" />
+  </ItemGroup>
+</Project>

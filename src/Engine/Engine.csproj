@@ -14,6 +14,7 @@
     <InternalsVisibleTo Include="NeverTest.MSTest"/>
     <InternalsVisibleTo Include="NeverTest.Scenarios.Yaml"/>
   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.*"/>
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.*"/>

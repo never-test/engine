@@ -12,13 +12,13 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Set Version Variable
+    - name: Set version
       env:
         TAG: ${{ github.ref_name }}
       run: echo "VERSION=${TAG#v}" >> $GITHUB_ENV      
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v1
-    - name: Install Aspire
+    - name: Install aspire
       run: dotnet workload install aspire
     - name: Install linux-dev-certs tool
       run: dotnet tool update -g linux-dev-certs

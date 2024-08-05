@@ -9,9 +9,14 @@ internal class Get(IHttpClientFactory clientFactory) :
 {
     public override async Task<object?> Act(
         JToken input,
-        IScenarioContext<IState> context) => await Send(
-        HttpMethod.Get,
-        HttpOptions.FromToken(input, context.JsonSerializer()),
-        null,
-        context);
+        IScenarioContext<IState> context)
+    {
+        var httpOptions = HttpOptions.FromToken(input, context.JsonSerializer());
+
+        return await Send(
+            HttpMethod.Get,
+            httpOptions,
+            null,
+            context);
+    }
 }

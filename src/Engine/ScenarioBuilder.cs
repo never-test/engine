@@ -16,9 +16,10 @@ using Yaml;
 /// <typeparam name="TState"></typeparam>
 public class ScenarioBuilder<TState> where TState : IState
 {
-    public static readonly ConcurrentDictionary<string, Task<TState>> States = new();
+    internal static readonly ConcurrentDictionary<string, Lazy<Task<TState>>> s_states = new();
     // ReSharper disable once StaticMemberInGenericType
-    public static readonly ConcurrentDictionary<string, ScenarioEngine> Engines = new();
+    internal static readonly ConcurrentDictionary<string, Lazy<ScenarioEngine>> s_engines = new();
+
     private readonly IServiceCollection _serviceCollection = new ServiceCollection();
 
     public ActBuilder<TState> Acts { get; }
@@ -41,20 +42,22 @@ public class ScenarioBuilder<TState> where TState : IState
 
     public IServiceCollection Services => _serviceCollection;
 
-    public ScenarioEngine Build()
+    public ScenarioEngine Build(string? id = null)
     {
-        var id = GetType().FullName!;
-        return Engines.GetOrAdd(id, engineId => new ScenarioEngine
-        {
-            EngineId = engineId,
-            DefaultProvider = _serviceCollection.BuildServiceProvider(),
-            DefaultServices = _serviceCollection,
-            Arranges = Arranges.Instances,
-            Acts = Acts.Instances,
-            Asserts = Asserts.Instances,
-        });
+        id ??= GetType().AssemblyQualifiedName!;
+        return s_engines
+            .GetOrAdd(
+                id,
+                engineId => new Lazy<ScenarioEngine>(() => new ScenarioEngine
+                {
+                    EngineId = engineId,
+                    DefaultProvider = _serviceCollection.BuildServiceProvider(),
+                    DefaultServices = _serviceCollection,
+                    Arranges = Arranges.Instances,
+                    Acts = Acts.Instances,
+                    Asserts = Asserts.Instances,
+                })).Value;
     }
-
     public ScenarioBuilder<TState> UseYaml()
     {
         _serviceCollection.AddOptions<YamlOptions>();
