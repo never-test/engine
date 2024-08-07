@@ -3,7 +3,7 @@ namespace NeverTest.Tests.CustomState;
 using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.Logging;
 
-public class MyRunner : Runner<MyScenarioState>
+public class MyRunner : RunnerBase<MyScenarioState>
 {
     protected override Task<MyScenarioState> CreateState(JToken? state)
     {

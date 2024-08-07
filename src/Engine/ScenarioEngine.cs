@@ -31,12 +31,14 @@ public class ScenarioEngine
         var focused = set.Scenarios.Where(x => x.Focus).ToArray();
 
         var scenarios = new List<Scenario<T>>();
+
         foreach (var scenario in focused.Length > 0 ? focused : set.Scenarios)
         {
             scenario.StateKey = key;
             scenario.EngineId = EngineId;
             scenario.SetOptions = set.Options;
             scenario.State = set.State;
+            scenario.SharedGiven = set.Given;
 
             scenarios.Add(scenario);
         }

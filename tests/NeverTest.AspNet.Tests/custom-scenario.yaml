@@ -1,0 +1,15 @@
+﻿scenarios:
+  - name: Should allow calling api
+    verbosity: debug
+    given:
+      my_cfg:
+        foo: bar
+    when:
+      $cfg:
+        getJson: /configuration
+    then:
+      $cfg:
+        matches:
+          - key: foo
+            value: bar
+

@@ -6,7 +6,7 @@ using MSTest;
 using NeverTests.AspireApp.Tests;
 using Newtonsoft.Json.Linq;
 
-public class AspireRunner : Runner<AspireState>
+public class Runner : RunnerBase<AspireState>
 {
     protected override async Task<AspireState> CreateState(JToken? state)
     {

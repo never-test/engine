@@ -63,8 +63,8 @@ public class AssertBuilder<TState>(ScenarioBuilder<TState> builder) where TState
             Invocation = async (actual,expected, sc) =>
             {
                 sc.Info("{Path}", expected?.Path ?? key.Value);
-                sc.Debug("\u21e8 act: {Actual}", actual?.ToString(Formatting.None));
-                sc.Debug("\u21e8 exp: {Expected}", expected?.ToString(Formatting.None));
+                sc.Debug("\u21e8 actual:   {Actual}", actual?.ToString(Formatting.None));
+                sc.Debug("\u272b expected: {Expected}", expected?.ToString(Formatting.None));
 
                 var registration = sc
                                        .Engine

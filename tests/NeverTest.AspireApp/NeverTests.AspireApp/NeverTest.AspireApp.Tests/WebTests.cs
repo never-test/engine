@@ -8,8 +8,7 @@ public class WebTests
     {
         // Arrange
 
-
-        IDistributedApplicationTestingBuilder appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.NeverTests_AspireApp_AppHost>();
+        var appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.NeverTests_AspireApp_AppHost>();
 
         appHost.Services.ConfigureHttpClientDefaults(clientBuilder =>
         {

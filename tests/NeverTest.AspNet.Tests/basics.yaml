@@ -1,0 +1,19 @@
+﻿scenarios:
+  - name: Should allow calling api
+    when:
+      get:
+        url: /weatherforecast
+    then: httpOk
+
+  - name: Should allow calling api again
+    describe: |
+      this scenario will create new host because
+      by default mode is set to isolated
+    when:
+      get: /weatherforecast
+    then: httpOk
+
+  - name:  Should return configuration data
+    when:
+      get: /configuration
+    then: httpOk

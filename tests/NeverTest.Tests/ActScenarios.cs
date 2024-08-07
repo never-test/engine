@@ -1,7 +1,7 @@
 namespace NeverTest.Tests;
 
 [TestClass]
-public class ActScenarios : Runner
+public class ActScenarios : DefaultRunner
 {
     [StandardSet(Sets.Acts.Basics)]
     public Task Basics(Scenario<Empty> s) => Run(s);

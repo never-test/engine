@@ -1,0 +1,31 @@
+﻿options:
+  mode: shared
+
+given:
+  app_settings:
+    foo: bar
+
+scenarios:
+  - name: Should allow calling api
+    when:
+      get:
+        url: /weatherforecast
+    then: httpOk
+
+  - name: Should allow calling api again
+    describe: |
+      this scenario will use same test host instance
+      because mode in set options is set to shared
+    when:
+      get: /weatherforecast
+    then: httpOk
+
+  - name: Should return changed config
+    when:
+      $config:
+        getJson: /configuration
+    then:
+      $config:
+        matches:
+          - key: foo
+            value: bar

@@ -31,7 +31,7 @@ public class HttpOptions
 
     public static HttpOptions FromToken(JToken token, JsonSerializer serializer) => token switch
     {
-        JValue value => new HttpOptions {Url = new Uri(value.Value<string>()!)},
+        JValue value => new HttpOptions {Url = new Uri(value.Value<string>()!, UriKind.RelativeOrAbsolute)},
         JObject obj => obj.ToObject<HttpOptions>(serializer)!,
         _ => throw new NotSupportedException($"{token.Type} is not supported as get options at  {token.Path}")
     };

@@ -13,6 +13,7 @@ internal abstract class HttpBase(IHttpClientFactory clientFactory) :
         context.Debug(options);
 
         var client = clientFactory.CreateClient(options.Name);
+
         var message = new HttpRequestMessage(method, options.Url)
         {
             Content = content

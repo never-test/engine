@@ -10,7 +10,7 @@ public abstract class ScenarioSetAttribute<T>(string path) : TestMethodAttribute
 
     public IEnumerable<object[]> GetData(MethodInfo methodInfo)
     {
-        var engine = Builder.Build();
+        var engine = Builder.Build(GetType().AssemblyQualifiedName!);
 
         var set = engine.LoadSet<T>(path);
 

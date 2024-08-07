@@ -6,27 +6,28 @@ namespace NeverTest.MSTest;
 
 /// <summary>
 /// Scenario runner using default empty state.
-/// Should
 /// </summary>
-public class Runner : Runner<Empty>
+public class DefaultRunner : RunnerBase<Empty>
 {
     protected override Task<Empty> CreateState(JToken? state) => Empty.Instance;
 }
-public abstract class Runner<T> where T : IState
+
+public abstract class RunnerBase<T> where T : IState
 {
 #nullable disable
     public TestContext TestContext { get; set; }
 #nullable enable
 
-    protected async Task Run(Scenario<T> scenario)
+    protected async Task Run(Scenario scenario)
     {
-        var result = await scenario.Run(CreateState);
+        var typedScenario = (Scenario<T>)scenario;
+        var result = await typedScenario.Run(CreateState);
 
         TestContext.WriteLine(result.GetHeader());
 
-        if (!string.IsNullOrEmpty(scenario.Inconclusive))
+        if (!string.IsNullOrEmpty(typedScenario.Inconclusive))
         {
-            Assert.Inconclusive(scenario.Inconclusive);
+            Assert.Inconclusive(typedScenario.Inconclusive);
         }
 
         foreach (var log in result.Logs)
@@ -41,3 +42,4 @@ public abstract class Runner<T> where T : IState
     }
     protected abstract Task<T> CreateState(JToken? state);
 }
+

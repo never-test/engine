@@ -2,7 +2,7 @@ namespace NeverTest.Tests;
 
 [TestClass]
 [TestCategory("online")]
-public class HttpScenarios : Runner
+public class HttpScenarios : DefaultRunner
 {
     [StandardSet(Sets.Http.Get)]
     public Task Get(Scenario<Empty> s) => Run(s);
